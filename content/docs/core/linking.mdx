@@ -1,0 +1,93 @@
+---
+title: Linking
+description: Query backlinks, outgoing links, find orphans, and manage the knowledge graph.
+---
+
+# Linking Module
+
+## Overview
+
+The **Linking** module provides programmatic access to Obsidian's graph‑related CLI commands: `backlinks`, `links`, `unresolved`, `orphans`, `create`, and `create-note`.
+
+## Quick Start
+
+```ts
+const backlinks = await obsidian.linking.backlinks({ file: "Project/Plan.md" });
+console.log(backlinks);
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `backlinks(input)` | `obsidian backlinks file=…` | Notes that link to the given file. |
+| `outgoing(input)` | `obsidian links file=…` | Notes that the given file links to. |
+| `unresolved()` | `obsidian unresolved` | All broken links in the vault. |
+| `orphans()` | `obsidian orphans` | Notes with no inbound links. |
+| `createLink(input)` | `obsidian append file=… content=[[link]]` | Appends a wikilink. |
+| `createNoteWithLink(input)` | `obsidian create path=… content=…` | Creates a new note with a link. |
+
+## Examples
+
+### Backlinks
+
+```ts
+const backs = await obsidian.linking.backlinks({ file: "Ideas/Feature.md" });
+console.log('Backlinks:', backs);
+```
+
+### Outgoing Links
+
+```ts
+const outs = await obsidian.linking.outgoing({ file: "Ideas/Feature.md" });
+console.log('Outgoing links:', outs);
+```
+
+### Unresolved Links
+
+```ts
+const broken = await obsidian.linking.unresolved();
+console.log('Broken links:', broken);
+```
+
+### Orphan Notes
+
+```ts
+const orphanNotes = await obsidian.linking.orphans();
+console.log('Orphans:', orphanNotes);
+```
+
+### Create a Link
+
+```ts
+await obsidian.linking.createLink({
+  file: "Ideas/Feature.md",
+  link: "ImplementationPlan"
+});
+```
+
+### Create a New Note with a Link
+
+```ts
+await obsidian.linking.createNoteWithLink({
+  path: "Projects/NewProject.md",
+  link: "Ideas/Feature.md",
+  content: "# New Project\nThis project relies on the Feature note."
+});
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.linking.backlinks({ file: "Nonexistent.md" });
+} catch (e) {
+  console.error('Backlinks failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Run `unresolved` regularly to keep the graph healthy.
+- Use `orphans` to discover isolated notes that may need linking or removal.
+- Prefer `createLink` for incremental linking; use `createNoteWithLink` for scaffolding new content.

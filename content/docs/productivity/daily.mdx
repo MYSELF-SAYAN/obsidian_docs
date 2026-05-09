@@ -1,0 +1,86 @@
+---
+title: Daily
+description: Programmatic access to daily notes, tasks, and template insertion.
+---
+
+# Daily Module
+
+## Overview
+
+The **Daily** module mirrors the Obsidian CLI `daily` family of commands, providing access to the daily note, its path, and its built‑in task system.
+
+## Quick Start
+
+```ts
+await obsidian.daily.open({ paneType: "tab" });
+await obsidian.daily.addTask({ content: "Review SDK docs" });
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `open(input?)` | `obsidian daily` | Open today's daily note. |
+| `read()` | `obsidian daily:read` | Retrieve raw markdown of the daily note. |
+| `append(input)` | `obsidian daily:append` | Append text to the note. |
+| `prepend(input)` | `obsidian daily:prepend` | Insert text at the top. |
+| `path()` | `obsidian daily:path` | Get the filesystem path. |
+| `tasks(input?)` | `obsidian tasks daily` | Return all tasks. |
+| `todo(input?)` | `obsidian tasks daily todo` | Return only incomplete tasks. |
+| `addTask(input)` | `obsidian daily:add` | Insert a new task line. |
+| `markDone(input)` | `obsidian task done` | Mark a task as completed. |
+| `markTodo(input)` | `obsidian task todo` | Re‑open a completed task. |
+| `insertTemplate(input)` | `obsidian template:insert` | Insert a template into the daily note. |
+
+## Examples
+
+### Open in a Window
+
+```ts
+await obsidian.daily.open({ paneType: "window" });
+```
+
+### Read Content
+
+```ts
+const content = await obsidian.daily.read();
+console.log('Daily note content:', content);
+```
+
+### Append and Prepend
+
+```ts
+await obsidian.daily.append({ content: "- Quick thought: refactor docs" });
+await obsidian.daily.prepend({ content: "# Daily Summary" });
+```
+
+### Task Management
+
+```ts
+await obsidian.daily.addTask({ content: "Write detailed docs" });
+await obsidian.daily.addTask({ content: "Publish release notes", done: true });
+await obsidian.daily.markDone({ ref: "2026-05-06.md:12" });
+await obsidian.daily.markTodo({ ref: "2026-05-06.md:12" });
+```
+
+### Insert Template
+
+```ts
+await obsidian.daily.insertTemplate({ name: "MorningAgenda" });
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.daily.markDone({ ref: "2026-05-06.md:999" });
+} catch (e) {
+  console.error('Failed to mark task done:', e.message);
+}
+```
+
+## Best Practices
+
+- Use `addTask` for programmatic task creation; keep `ref` format (`path:line`) stable.
+- Prefer `append` for quick notes, `prepend` for headers.
+- Store template names in a dedicated folder for consistency.

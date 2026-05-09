@@ -1,0 +1,66 @@
+---
+title: Sync
+description: Manage Obsidian Sync settings and view sync history.
+---
+
+# Sync Module
+
+## Overview
+
+The **Sync** module provides a wrapper around Obsidian's built‑in sync service CLI commands. Inspect the sync status, enable or disable sync, and query sync history.
+
+## Quick Start
+
+```ts
+const status = await obsidian.sync.status();
+console.log('Sync status:', status);
+
+if (status !== 'on') {
+  await obsidian.sync.enable();
+  console.log('Sync enabled');
+}
+
+const history = await obsidian.sync.history('Notes/ProjectPlan.md');
+console.log('Sync history:', history);
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `status()` | `obsidian sync` | Returns `on` or `off`. |
+| `enable()` | `obsidian sync:on` | Turns sync on. |
+| `disable()` | `obsidian sync:off` | Turns sync off. |
+| `history(path)` | `obsidian sync:history path=…` | Returns an array of sync revisions. |
+| `restore(path, revision)` | `obsidian sync:restore path=… version=…` | Restores to a sync revision. |
+
+## Examples
+
+```ts
+// Status
+const syncStatus = await obsidian.sync.status();
+
+// Enable / Disable
+await obsidian.sync.enable();
+await obsidian.sync.disable();
+
+// History & Restore
+const fileHistory = await obsidian.sync.history('Notes/DesignSpec.md');
+await obsidian.sync.restore('Notes/DesignSpec.md', 2);
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.sync.enable();
+} catch (e) {
+  console.error('Unable to enable sync:', e.message);
+}
+```
+
+## Best Practices
+
+- Keep sync enabled for critical vaults to avoid data loss.
+- Review `history` before restoring to ensure you are rolling back to the intended version.
+- Use `status` to verify sync health before triggering batch operations.

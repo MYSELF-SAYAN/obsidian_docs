@@ -1,0 +1,60 @@
+---
+title: FileOps
+description: Low-level file operations — read, move, copy, and prepend for any file type.
+---
+
+# FileOps Module
+
+## Overview
+
+The **FileOps** module provides low‑level file manipulation commands not covered by the Notes API. It works with any file type inside the vault (markdown, images, attachments, etc.).
+
+## Quick Start
+
+```ts
+const md = await obsidian.fileOps.read('Docs/Guide.md');
+console.log(md);
+
+await obsidian.fileOps.move('Docs/OldGuide.md', 'Archive/Guide.md');
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `read(path)` | `obsidian read path=…` | Returns raw file contents as a string. |
+| `move(src, dest)` | `obsidian move src=… dest=…` | Moves or renames a file. |
+| `copy(src, dest)` | `obsidian copy src=… dest=…` | Copies a file. |
+| `prepend(path, content)` | `obsidian prepend path=… content=…` | Prepends text to a file. |
+
+## Examples
+
+```ts
+// Read
+const content = await obsidian.fileOps.read('Notes/Tech.md');
+
+// Move / Rename
+await obsidian.fileOps.move('Notes/OldName.md', 'Notes/NewName.md');
+
+// Copy
+await obsidian.fileOps.copy('Assets/logo.png', 'Assets/backup/logo.png');
+
+// Prepend a header
+await obsidian.fileOps.prepend('Notes/Tech.md', '# Technology Overview\n');
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.fileOps.read('nonexistent.md');
+} catch (e) {
+  console.error('Read failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Use `move` for atomic renames rather than `copy` + `delete`.
+- Prefer `prepend` for inserting YAML front‑matter or section headers.
+- Validate paths relative to the vault root.

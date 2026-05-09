@@ -1,0 +1,54 @@
+---
+title: History
+description: Inspect version history, compute diffs, and restore notes to previous states.
+---
+
+# History Module
+
+## Overview
+
+The **History** module mirrors the Obsidian CLI `history`, `diff`, and `restore` commands, allowing you to inspect version history, compute diffs, and roll back notes.
+
+## Quick Start
+
+```ts
+const revisions = await obsidian.history.list('Notes/ProjectPlan.md');
+console.log('Revisions:', revisions);
+
+const diff = await obsidian.history.diff('Notes/ProjectPlan.md', 1, 2);
+console.log('Diff:', diff);
+
+await obsidian.history.restore('Notes/ProjectPlan.md', 1);
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `list(path)` | `obsidian history path=…` | Returns revision metadata. |
+| `diff(path, from, to)` | `obsidian diff path=… from=… to=…` | Computes a unified diff. |
+| `restore(path, version)` | `obsidian restore path=… version=…` | Restores the note to a revision. |
+
+## Examples
+
+```ts
+const history = await obsidian.history.list('Notes/Design.md');
+const diff = await obsidian.history.diff('Notes/Design.md', 2, 3);
+await obsidian.history.restore('Notes/Design.md', 1);
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.history.restore('Notes/Design.md', 99);
+} catch (e) {
+  console.error('Restore failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Review the diff before restoring to avoid accidental data loss.
+- Keep a backup of critical notes outside Obsidian before destructive restores.
+- Use `list` to display timestamps and author information for each revision.

@@ -1,0 +1,61 @@
+---
+title: Dev
+description: Developer utilities — DevTools, eval, and screenshots for debugging.
+---
+
+# Dev Module
+
+## Overview
+
+The **Dev** module provides utilities for debugging and development directly from the CLI. Toggle DevTools, evaluate JavaScript in the Obsidian context, and capture screenshots.
+
+## Quick Start
+
+```ts
+await obsidian.dev.toggleDevTools();
+
+const version = await obsidian.dev.eval('app.version');
+console.log('Obsidian version:', version);
+
+await obsidian.dev.screenshot('C:/temp/obsidian.png');
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `toggleDevTools()` | `obsidian devtools` | Shows/hides Chromium DevTools. |
+| `eval(code)` | `obsidian eval code=…` | Executes JavaScript in Obsidian context. |
+| `screenshot(path)` | `obsidian dev:screenshot path=…` | Captures a PNG screenshot. |
+
+## Examples
+
+```ts
+// Toggle DevTools
+await obsidian.dev.toggleDevTools();
+
+// Evaluate JavaScript
+const theme = await obsidian.dev.eval('app.vault.getConfig("theme")');
+console.log('Current theme:', theme);
+
+// Capture a screenshot
+await obsidian.dev.screenshot('C:/temp/obsidian.png');
+```
+
+## Error Handling
+
+```ts
+try {
+  const result = await obsidian.dev.eval('nonexistentFunction()');
+} catch (e) {
+  console.error('Eval error:', e.message);
+}
+```
+
+## Best Practices
+
+- Limit `eval` to development builds; avoid untrusted code in production.
+- Delete screenshots after use to avoid leaking sensitive UI data.
+- Use `toggleDevTools` to inspect state while debugging plugin code.
+
+> **Warning:** The Dev module is intended for development and debugging only. Do not use in production scripts.

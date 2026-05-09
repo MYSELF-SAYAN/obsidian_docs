@@ -1,0 +1,56 @@
+---
+title: Templates
+description: Render and insert named templates into notes via the CLI.
+---
+
+# Templates Module
+
+## Overview
+
+The **Templates** module interfaces with the Obsidian CLI `template:read` and `template:insert` commands. Render a named template without inserting it, or insert a rendered template into a target note.
+
+## Quick Start
+
+```ts
+const tmpl = await obsidian.templates.read('Weekly');
+console.log(tmpl);
+
+await obsidian.templates.insert('Weekly', 'Notes/Agenda.md');
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `read(name)` | `obsidian template:read name=…` | Returns rendered markdown of the template. |
+| `insert(name, path?)` | `obsidian template:insert name=… [path=…]` | Inserts template into the specified file. |
+
+## Examples
+
+```ts
+// Render without inserting
+const weekly = await obsidian.templates.read('Weekly');
+console.log('Weekly template:', weekly);
+
+// Insert into a specific note
+await obsidian.templates.insert('Weekly', 'Notes/WeeklyAgenda.md');
+
+// Insert at current cursor (no path)
+await obsidian.templates.insert('MeetingNotes');
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.templates.read('Nonexistent');
+} catch (e) {
+  console.error('Template not found:', e.message);
+}
+```
+
+## Best Practices
+
+- Keep template names short and descriptive.
+- Store all templates in a dedicated folder for easy backup.
+- Use `read` when you need to embed template content inside generated markdown.

@@ -1,0 +1,94 @@
+---
+title: Search
+description: Full-text search, contextual search, tag queries, and task filtering across your vault.
+---
+
+# Search Module
+
+## Overview
+
+The **Search** module wraps the Obsidian CLI `search` family of commands. It supports full‑text search, context‑aware search, tag enumeration, front‑matter property queries, task queries, and raw query execution.
+
+## Quick Start
+
+```ts
+const results = await obsidian.search.search({ query: "important" });
+console.log(results);
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `search(input)` | `obsidian search query=…` | Full‑text search. |
+| `searchWithContext(input)` | `obsidian search:context query=…` | Search with surrounding lines. |
+| `getTags(input?)` | `obsidian tags` | List all tags, optionally sorted. |
+| `getProperty(input)` | `obsidian property:read name=…` | Retrieve a front‑matter property. |
+| `tasks(input)` | `obsidian tasks` | Query tasks by status, path, etc. |
+| `raw(query, flags?)` | `obsidian search query=… [flags]` | Direct raw query. |
+
+## Examples
+
+### Full-text Search
+
+```ts
+const hits = await obsidian.search.search({ query: "deadline" });
+console.log('Search hits:', hits);
+```
+
+### Search With Context
+
+```ts
+const ctx = await obsidian.search.searchWithContext({
+  query: "TODO",
+  limit: 5,
+});
+console.log('Contextual results:', ctx);
+```
+
+### List All Tags
+
+```ts
+const tags = await obsidian.search.getTags({ sort: "count" });
+console.log('Tags sorted by usage:', tags);
+```
+
+### Get a Front-Matter Property
+
+```ts
+const status = await obsidian.search.getProperty({
+  name: "status",
+  path: "Projects/Alpha.md"
+});
+console.log('Project status:', status);
+```
+
+### Query TODO Tasks
+
+```ts
+const todos = await obsidian.search.tasks({ status: "todo" });
+console.log('Pending tasks:', todos);
+```
+
+### Raw Complex Query
+
+```ts
+const raw = await obsidian.search.raw('tag:project AND "release"', ['case']);
+console.log('Raw query results:', raw);
+```
+
+## Error Handling
+
+```ts
+try {
+  const bad = await obsidian.search.search({ query: "" });
+} catch (e) {
+  console.error('Search error:', e.message);
+}
+```
+
+## Best Practices
+
+- Use `limit` for large vaults to keep responses manageable.
+- Cache tag lists if they are used frequently.
+- Prefer `searchWithContext` when you need surrounding lines for relevance.

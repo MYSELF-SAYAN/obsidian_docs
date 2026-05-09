@@ -1,0 +1,78 @@
+---
+title: Files
+description: Enumerate and filter every file in your Obsidian vault with type, size, and timestamp metadata.
+---
+
+# Files Module
+
+## Overview
+
+The **Files** module is a thin, type‑safe wrapper around the Obsidian CLI `files` command. It enumerates every file in the active vault and returns a structured JSON list containing the file path, type, size, and timestamps. This module is read‑only.
+
+## Quick Start
+
+```ts
+const files = await obsidian.files.list();
+console.log(files);
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `list()` | `obsidian files` | Returns a JSON array of every file in the vault. |
+| `list({ filter })` | `obsidian files --filter <expr>` | Returns a filtered list. |
+
+## API Reference
+
+### `list(options?)`
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `options.filter` | `string` | ❌ | CLI‑style filter expression, e.g. `type:note`. |
+
+**Returns** – `Promise<FileInfo[]>` — array of `{ path, type, size, created, modified }`.
+
+```ts
+const mdNotes = await obsidian.files.list({ filter: "type:note" });
+console.log('Markdown notes:', mdNotes.length);
+```
+
+## Examples
+
+### List All Files
+
+```ts
+const allFiles = await obsidian.files.list();
+console.log('Total files in vault:', allFiles.length);
+```
+
+### Filter by Path Prefix
+
+```ts
+const projectFiles = await obsidian.files.list({ filter: "path:/Projects/" });
+console.log('Project files:', projectFiles.map(f => f.path));
+```
+
+### Paginate Large Vaults
+
+```ts
+const page1 = await obsidian.files.list({ filter: "", skip: 0, limit: 100 });
+const page2 = await obsidian.files.list({ filter: "", skip: 100, limit: 100 });
+```
+
+## Error Handling
+
+```ts
+try {
+  const files = await obsidian.files.list({ filter: "invalid:expr" });
+} catch (err) {
+  console.error('Failed to list files:', err.message);
+}
+```
+
+## Best Practices
+
+- **Paginate** for vaults with >10k files to avoid loading huge arrays.
+- **Cache** the result if you need the file list repeatedly within a short time frame.
+- Use the **filter** option instead of client‑side `Array.filter` for performance.

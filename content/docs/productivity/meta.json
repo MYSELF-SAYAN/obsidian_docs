@@ -1,0 +1,10 @@
+{
+  "title": "Productivity",
+  "icon": "lightbulb",
+  "pages": [
+    "daily",
+    "templates",
+    "workspace",
+    "random"
+  ]
+}

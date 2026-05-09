@@ -1,0 +1,51 @@
+---
+title: SystemInfo
+description: System diagnostics and application reloading.
+---
+
+# SystemInfo Module
+
+## Overview
+
+The **SystemInfo** module exposes commands that provide diagnostics about the application version and allow UI reload or full restart.
+
+## Quick Start
+
+```ts
+const ver = await obsidian.systemInfo.version();
+console.log('Obsidian version:', ver);
+
+await obsidian.systemInfo.reload();
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `version()` | `obsidian version` | Returns the current Obsidian version. |
+| `reload()` | `obsidian reload` | Reloads the UI without quitting. |
+| `restart()` | `obsidian restart` | Restarts the entire application. |
+
+## Examples
+
+```ts
+const version = await obsidian.systemInfo.version();
+await obsidian.systemInfo.reload();
+await obsidian.systemInfo.restart();
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.systemInfo.restart();
+} catch (e) {
+  console.error('Restart failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Use `reload` for UI‑level changes (theme, CSS) that do not affect core state.
+- Use `restart` after installing core plugins or when a full reset is needed.
+- Verify the version before performing migrations.

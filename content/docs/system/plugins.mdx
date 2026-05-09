@@ -1,0 +1,58 @@
+---
+title: Plugins
+description: List, enable, disable, and reload Obsidian community plugins.
+---
+
+# Plugins Module
+
+## Overview
+
+The **Plugins** module wraps the Obsidian CLI commands for managing community plugins.
+
+## Quick Start
+
+```ts
+const plugins = await obsidian.plugins.list();
+console.log('Installed plugins:', plugins);
+
+await obsidian.plugins.enable('dataview');
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `list()` | `obsidian plugins` | Returns an array of plugin IDs. |
+| `enable(id)` | `obsidian plugin:enable id=…` | Enables the specified plugin. |
+| `disable(id)` | `obsidian plugin:disable id=…` | Disables the specified plugin. |
+| `reload(id)` | `obsidian plugin:reload id=…` | Reloads the plugin. |
+
+## Examples
+
+```ts
+// List all plugins
+const plugins = await obsidian.plugins.list();
+
+// Enable / Disable
+await obsidian.plugins.enable('dataview');
+await obsidian.plugins.disable('calendar');
+
+// Reload during development
+await obsidian.plugins.reload('my-plugin');
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.plugins.enable('nonexistent');
+} catch (e) {
+  console.error('Enable failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Enable only the plugins you need to reduce UI lag.
+- Use `reload` during development instead of restarting Obsidian.
+- Plugin IDs match the folder name under `.obsidian/plugins`.

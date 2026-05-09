@@ -1,0 +1,51 @@
+---
+title: Random
+description: Utilities to select random notes from your vault.
+---
+
+# Random Module
+
+## Overview
+
+The **Random** module provides utilities to select a random note from the vault, either returning its file path or its full markdown content. Useful for testing, inspiration, or sampling.
+
+## Quick Start
+
+```ts
+const path = await obsidian.random.pick();
+console.log('Random note:', path);
+
+const content = await obsidian.random.read();
+console.log('Random note content:', content);
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `pick()` | `obsidian random` | Returns the path of a randomly chosen note. |
+| `read()` | `obsidian random:read` | Returns the raw markdown of a randomly chosen note. |
+
+## Examples
+
+```ts
+const randomPath = await obsidian.random.pick();
+const randomContent = await obsidian.random.read();
+
+// Prepend a header to a randomly selected note
+await obsidian.fileOps.prepend(randomPath, '# Randomly Selected Note\n');
+```
+
+## Error Handling
+
+```ts
+const maybePath = await obsidian.random.pick();
+if (!maybePath) {
+  console.warn('Vault contains no notes');
+}
+```
+
+## Best Practices
+
+- Use random selection for brainstorming or testing, not for critical logic.
+- Combine with filtering for more controlled sampling.

@@ -1,0 +1,147 @@
+---
+title: Notes
+description: Full CRUD operations for markdown notes with YAML front-matter support.
+---
+
+# Notes Module
+
+## Overview
+
+The **Notes** module maps directly to the Obsidian CLI `create`, `read`, `append`, `rename`, `delete`, and `property:set` commands. It provides full CRUD (Create, Read, Update, Delete) capabilities for markdown notes within a vault and utilities for manipulating YAML front‑matter properties.
+
+## Prerequisites
+
+- Obsidian v1.12.0+ with **CLI enabled**.
+- Active vault name supplied when constructing `new Obsidian({ vault })`.
+
+## Quick Start
+
+```ts
+// Create a new note
+await obsidian.notes.create({
+  path: "Notes/NewIdea.md",
+  content: "# New Idea\nThis is a fresh note."
+});
+
+// Read the note back
+const note = await obsidian.notes.read({ path: "Notes/NewIdea.md" });
+console.log(note);
+```
+
+## Usage
+
+| Method | Description |
+| ------ | ----------- |
+| `create(data)` | Create a new note at `data.path` with `data.content`. |
+| `read(input)` | Read a note by `path` (returns raw markdown string). |
+| `append(input)` | Append `input.content` to the end of the note at `input.path`. |
+| `overwrite(input)` | Replace the entire note content (adds `overwrite` flag). |
+| `renameFile(input)` | Rename a note file. |
+| `delete(input)` | Soft‑delete (default) or permanently delete a note. |
+| `setProperty(input)` | Set a YAML front‑matter property. |
+
+## API Reference
+
+### `create({ path, content, overwrite? })`
+
+Creates a new markdown note.
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `path` | `string` | ✅ | Relative path inside the vault, e.g. `Notes/Idea.md`. |
+| `content` | `string` | ✅ | Full markdown content to write. |
+| `overwrite` | `boolean` | ❌ | If true, replace any existing file. |
+
+**Returns** – `Promise<void>`.
+
+```ts
+await obsidian.notes.create({
+  path: "Journal/2026-05-06.md",
+  content: "# Daily Journal\nToday I explored the Obsidian SDK."
+});
+```
+
+### `read({ path })`
+
+Returns the raw markdown of a note.
+
+```ts
+const content = await obsidian.notes.read({ path: "Journal/2026-05-06.md" });
+console.log('Note content:', content);
+```
+
+### `append({ path, content })`
+
+Appends new markdown to the end of an existing note.
+
+```ts
+await obsidian.notes.append({
+  path: "Journal/2026-05-06.md",
+  content: "\n## Reflections\nI learned about module documentation."
+});
+```
+
+### `overwrite({ path, content })`
+
+Replaces the entire file contents.
+
+```ts
+await obsidian.notes.overwrite({
+  path: "Journal/2026-05-06.md",
+  content: "# Updated Title\nAll previous content replaced."
+});
+```
+
+### `renameFile({ path, name })`
+
+Renames a note while preserving its directory.
+
+```ts
+await obsidian.notes.renameFile({
+  path: "Journal/2026-05-06.md",
+  name: "2026-05-06-Journal.md"
+});
+```
+
+### `delete({ path, permanent? })`
+
+Soft‑delete moves the file to the Obsidian trash; `permanent: true` bypasses the trash.
+
+```ts
+// Soft delete (default)
+await obsidian.notes.delete({ path: "Journal/2026-05-06-Journal.md" });
+
+// Permanent delete
+await obsidian.notes.delete({ path: "Journal/2026-05-06-Journal.md", permanent: true });
+```
+
+### `setProperty({ path, name, value })`
+
+Sets a YAML front‑matter property on a note.
+
+```ts
+await obsidian.notes.setProperty({
+  path: "Journal/2026-05-06-Journal.md",
+  name: "status",
+  value: "draft"
+});
+```
+
+## Error Handling
+
+All methods throw on failure – for example, when a path does not exist or the CLI is not reachable.
+
+```ts
+try {
+  await obsidian.notes.read({ path: "Nonexistent.md" });
+} catch (e) {
+  console.error('Read failed:', e.message);
+}
+```
+
+## Best Practices
+
+- **Append** for incremental updates; use **overwrite** only when you intend to replace the entire document.
+- Store structured metadata in YAML front‑matter via `setProperty` instead of embedding it in the body.
+- Prefer **soft‑delete** during development; switch to permanent delete only for final cleanup.
+- Validate paths before calling rename/delete to avoid accidental data loss.

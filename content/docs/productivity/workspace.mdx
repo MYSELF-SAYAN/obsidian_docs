@@ -1,0 +1,52 @@
+---
+title: Workspace
+description: Save and restore Obsidian pane layouts for context switching.
+---
+
+# Workspace Module
+
+## Overview
+
+The **Workspace** module wraps the Obsidian CLI `workspace:save` and `workspace:load` commands, letting you persist the current pane layout and restore it later.
+
+## Quick Start
+
+```ts
+await obsidian.workspace.save('coding');
+await obsidian.workspace.load('coding');
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `save(name)` | `obsidian workspace:save name=…` | Persists the current layout. |
+| `load(name)` | `obsidian workspace:load name=…` | Restores a saved layout. |
+
+## Examples
+
+```ts
+await obsidian.workspace.save('research');
+await obsidian.workspace.load('research');
+
+// Switch between multiple workspaces
+await obsidian.workspace.save('coding');
+await obsidian.workspace.save('writing');
+await obsidian.workspace.load('coding');
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.workspace.load('nonexistent');
+} catch (e) {
+  console.error('Workspace load failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Use descriptive names (`coding`, `research`, `meeting`) for easy recall.
+- Save a workspace before performing large UI changes so you can revert quickly.
+- Workspaces are stored per‑vault.

@@ -1,0 +1,43 @@
+---
+title: Metrics
+description: Analytics on notes including word count and outline extraction.
+---
+
+# Metrics Module
+
+## Overview
+
+Provides analytics on notes: word count and outline extraction.
+
+## Quick Start
+
+```ts
+const wc = await obsidian.metrics.wordCount('Notes/SomeNote.md');
+console.log(`Words: ${wc}`);
+
+const outline = await obsidian.metrics.outline('Notes/SomeNote.md');
+console.log(outline);
+```
+
+## API Reference
+
+| Method | Description |
+| ------ | ----------- |
+| `wordCount(path)` | Compute word count for a note. |
+| `outline(path)` | Extract an outline of headings from a note. |
+
+## Examples
+
+```ts
+// Word count
+const wordCount = await obsidian.metrics.wordCount('Notes/Report.md');
+
+// Generate outline
+const toc = await obsidian.metrics.outline('Notes/Report.md');
+```
+
+## Best Practices
+
+- Use `wordCount` to enforce length guidelines.
+- Use `outline` to build navigation sidebars.
+- Metrics operate on the raw markdown content; they do not consider embedded media.

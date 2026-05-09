@@ -1,0 +1,37 @@
+---
+title: Quick Start
+description: Get up and running with the Obsidian SDK in under 2 minutes.
+---
+
+# Quick Start
+
+## Install
+
+```bash
+npm install obsidian-sdk
+```
+
+## Set up the SDK
+
+```ts
+import { Obsidian } from "obsidian-sdk";
+
+// Replace "myVault" with the name of the vault you want to work with.
+const obsidian = new Obsidian({ vault: "myVault" });
+```
+
+## Minimal example
+
+```ts
+// List files in the vault
+const files = await obsidian.files.list();
+console.log(files);
+```
+
+## Running the example
+
+```bash
+node quickstart.js
+```
+
+*All other modules follow the same pattern – instantiate the class via the `obsidian` instance and call the async methods.*

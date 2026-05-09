@@ -1,0 +1,10 @@
+{
+  "title": "Core APIs",
+  "pages": [
+    "notes",
+    "files",
+    "fileOps",
+    "search",
+    "linking"
+  ]
+}

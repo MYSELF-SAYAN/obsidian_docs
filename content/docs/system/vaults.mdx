@@ -1,0 +1,64 @@
+---
+title: Vaults
+description: List and switch between Obsidian vaults programmatically.
+---
+
+# Vaults Module
+
+## Overview
+
+The **Vaults** module gives you programmatic access to Obsidian's vault management CLI commands — list all configured vaults and switch the active vault.
+
+## Quick Start
+
+```ts
+const vaults = await obsidian.vaults.listVaults();
+console.log('Available vaults:', vaults);
+
+await obsidian.vaults.setVault('PersonalVault');
+```
+
+## Usage
+
+| Method | CLI Command | Description |
+| ------ | ----------- | ----------- |
+| `listVaults()` | `obsidian vaults` | Returns an array of vault names. |
+| `setVault(name)` | `obsidian vault name=…` | Changes the active vault. |
+
+## Examples
+
+### List Vaults
+
+```ts
+const vaults = await obsidian.vaults.listVaults();
+console.log('Vaults:', vaults);
+```
+
+### Switch Vault Safely
+
+```ts
+const target = 'WorkVault';
+const vaults = await obsidian.vaults.listVaults();
+if (vaults.includes(target)) {
+  await obsidian.vaults.setVault(target);
+  console.log(`Switched to ${target}`);
+} else {
+  console.warn(`Vault ${target} not found`);
+}
+```
+
+## Error Handling
+
+```ts
+try {
+  await obsidian.vaults.setVault('UnknownVault');
+} catch (e) {
+  console.error('Vault switch failed:', e.message);
+}
+```
+
+## Best Practices
+
+- Validate the target vault exists before switching.
+- Keep vault names consistent across environments.
+- SDK instances created before a vault switch retain the old context; create a new `Obsidian` instance after switching.
