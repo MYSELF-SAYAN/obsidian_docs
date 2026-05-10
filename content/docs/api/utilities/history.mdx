@@ -1,0 +1,203 @@
+---
+title: History
+description: Auto-generated API documentation.
+---
+
+# History Service
+
+View and restore local file history (File Recovery).
+
+## Service Overview
+
+The History service provides access to Obsidian's local file history (File Recovery feature). View historical versions of notes and restore previous versions.
+
+## Base URL
+
+```
+/api/utilities/history
+```
+
+## Endpoints
+
+---
+
+### GET /api/utilities/history
+
+Get file history overview.
+
+**CLI Command:** `obsidian history`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/history?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Notes.md - 5 versions",
+      "Projects/Overview.md - 3 versions"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/utilities/history/file/:name
+
+Get history for a specific file.
+
+**CLI Command:** `obsidian history`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | File name |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/history/file/Notes.md?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "2026-05-09 14:30",
+      "2026-05-09 10:15",
+      "2026-05-08 16:45"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/utilities/history/read
+
+Read a specific historical version of a file.
+
+**CLI Command:** `obsidian history:read`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file |
+| `path` | string | No | Full path |
+| `timestamp` | string | No | Specific version timestamp |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/history/read?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "# Notes (Previous Version)\n\nContent from the past..."
+  }
+}
+```
+
+**Read specific timestamp:**
+```bash
+curl "http://localhost:3000/api/utilities/history/read?file=Notes.md&timestamp=2026-05-08T16:45:00&vault=youtube"
+```
+
+**Python (specific timestamp):**
+```python
+response = requests.get("http://localhost:3000/api/utilities/history/read", params={
+    "file": "Notes.md",
+    "timestamp": "2026-05-08T16:45:00",
+    "vault": "youtube"
+})
+```
+
+---
+
+### POST /api/utilities/history/restore
+
+Restore a file from history.
+
+**CLI Command:** `obsidian history:restore`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file |
+| `path` | string | No | Full path |
+| `timestamp` | string | No | Version timestamp to restore |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/history/restore?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "timestamp": "2026-05-08T16:45:00"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/history/open?file=Notes.md&vault=youtube"
+```
+
+```bash
+# Compare current with yesterday's version
+CURRENT=$(curl -s "http://localhost:3000/api/file/read?file=Notes.md&vault=youtube" | jq -r '.data')
+PREVIOUS=$(curl -s "http://localhost:3000/api/utilities/history/read?file=Notes.md&vault=youtube" | jq -r '.data')
+
+echo "=== Current ==="
+echo "$CURRENT"
+echo ""
+echo "=== Previous ==="
+echo "$PREVIOUS"
+```
+
+```bash
+# Find the version before the mistake
+HISTORY=$(curl -s "http://localhost:3000/api/utilities/history/file/Notes.md?vault=youtube" | jq -r '.data.data[1]')
+
+# Restore
+TIMESTAMP=$(echo "$HISTORY" | grep -oP '\d{4}-\d{2}-\d{2} \d{2}:\d{2}')
+curl -X POST "http://localhost:3000/api/utilities/history/restore?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d "{\"file\": \"Notes.md\", \"timestamp\": \"$TIMESTAMP\"}"
+```
+

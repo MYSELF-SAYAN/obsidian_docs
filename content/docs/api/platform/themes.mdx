@@ -1,0 +1,170 @@
+---
+title: Themes
+description: Auto-generated API documentation.
+---
+
+# Themes Service
+
+Manage Obsidian themes - list, install, set, and uninstall.
+
+## Service Overview
+
+The Themes service provides endpoints to manage visual themes for your Obsidian interface, including listing available themes, installing community themes, and switching between themes.
+
+## Base URL
+
+```
+/api/platform/themes
+/api/platform/theme
+```
+
+## Endpoints
+
+---
+
+### GET /api/platform/themes
+
+List all available themes (installed and community).
+
+**CLI Command:** `obsidian themes`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/themes?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "obsidian",
+      "atom",
+      "nord",
+      " Dracula"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/platform/theme/current
+
+Get the currently active theme.
+
+**CLI Command:** `obsidian theme`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/theme/current?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "obsidian"
+  }
+}
+```
+
+---
+
+### GET /api/platform/theme/:id
+
+Get information about a specific theme.
+
+**CLI Command:** `obsidian theme`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Theme identifier |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/theme/nord?vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/theme/set?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "nord"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Theme set to: nord"
+}
+```
+
+---
+
+### POST /api/platform/theme/install
+
+Install a theme from the community store.
+
+**CLI Command:** `obsidian theme:install`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Theme ID |
+| `enable` | boolean | No | Enable after install (default true) |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/theme/install?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "nord"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:3000/api/platform/theme/nord?vault=youtube"
+```
+
+```bash
+# Switch to a theme temporarily for preview
+curl -X POST "http://localhost:3000/api/platform/theme/set?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "dracula"}'
+
+# Do your work...
+
+# Switch back to default
+curl -X POST "http://localhost:3000/api/platform/theme/set?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "obsidian"}'
+```
+
+```bash
+# One-step install with auto-enable
+curl -X POST "http://localhost:3000/api/platform/theme/install?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "nord", "enable": true}'
+```
+

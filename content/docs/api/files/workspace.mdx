@@ -1,0 +1,297 @@
+---
+title: Workspace
+description: Auto-generated API documentation.
+---
+
+# Workspace Service
+
+Manage workspaces, tabs, and recent files.
+
+## Service Overview
+
+The Workspace service provides endpoints for managing Obsidian workspaces (saved layouts), open tabs, and recently opened files.
+
+## Base URL
+
+```
+/api/files/workspace
+/api/files/tabs
+/api/files/recents
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/workspace
+
+Get workspace information and settings.
+
+**CLI Command:** `obsidian workspace`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `format` | string | No | Output format |
+| `ids` | boolean | No | Include pane IDs |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/workspace?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "kv",
+    "data": {
+      "active": "default",
+      "panes": "3"
+    }
+  }
+}
+```
+
+---
+
+### GET /api/files/workspace/list
+
+List all saved workspaces.
+
+**CLI Command:** `obsidian workspaces`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/workspace/list?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "default",
+      "writing-mode",
+      "research"
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/files/workspace/save
+
+Save current workspace layout.
+
+**CLI Command:** `obsidian workspace:save`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Workspace name |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/workspace/save?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "writing-mode"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Workspace saved: writing-mode"
+}
+```
+
+---
+
+### POST /api/files/workspace/load
+
+Load a saved workspace layout.
+
+**CLI Command:** `obsidian workspace:load`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Workspace name |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/workspace/load?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "writing-mode"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:3000/api/files/workspace/old-workspace?vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/tabs?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Notes.md",
+      "Projects/Overview.md",
+      "Daily/2026-05-09.md"
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/files/tabs/open
+
+Open a file in a new tab.
+
+**CLI Command:** `obsidian tab:open`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File to open |
+| `path` | string | No | Full path |
+| `view` | string | No | View type |
+| `group` | number | No | Tab group number |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/tabs/open?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Projects/Overview.md"}'
+```
+
+```bash
+curl -X POST "http://localhost:3000/api/files/tabs/open?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "group": 2}'
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/recents?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Notes.md",
+      "Projects/Overview.md",
+      "Daily/2026-05-09.md",
+      "Templates/daily.md"
+    ]
+  }
+}
+```
+
+**With limit:**
+```bash
+curl "http://localhost:3000/api/files/recents?limit=10&vault=youtube"
+```
+
+---
+
+## Use Cases
+
+### Save Workspace Setup
+
+```bash
+# Save current workspace for a specific mode
+curl -X POST "http://localhost:3000/api/files/workspace/save?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "research-mode"}'
+
+# Load when starting research
+curl -X POST "http://localhost:3000/api/files/workspace/load?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "research-mode"}'
+```
+
+### Open Multiple Files as Tabs
+
+```bash
+# Open project files for review
+FILES=("Projects/Overview.md" "Projects/Tasks.md" "Projects/Notes.md")
+for file in "${FILES[@]}"; do
+  curl -X POST "http://localhost:3000/api/files/tabs/open?vault=youtube" \
+    -H "Content-Type: application/json" \
+    -d "{\"file\": \"$file\"}"
+done
+```
+
+---
+
+## Error Handling
+
+**Workspace Not Found:**
+```json
+{
+  "success": false,
+  "error": "Workspace not found: nonexistent"
+}
+```
+
+**File Not Open:**
+```json
+{
+  "success": false,
+  "error": "File not currently open"
+}
+```
+
+## Related Services
+
+- [File Service](./file) - File operations
+- [Daily Service](./daily) - Daily notes
+
+## Notes
+
+- Workspaces save layout, open files, and pane positions
+- Tabs are per-workspace in Obsidian
+- Recent files have configurable history length
+- Workspaces require the Workspaces plugin (community)

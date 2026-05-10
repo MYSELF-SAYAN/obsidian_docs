@@ -1,0 +1,257 @@
+---
+title: File
+description: Auto-generated API documentation.
+---
+
+# File Service
+
+Create, read, update, move, rename, and delete files in your Obsidian vault.
+
+## Service Overview
+
+The File service provides comprehensive file operations including reading note content, creating new files, appending/prepending content, moving and renaming files, and deleting files.
+
+## Base URL
+
+```
+/api/files/files/file
+/api/files/files
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/file
+
+Get information about the currently active file.
+
+**CLI Command:** `obsidian file`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/file?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "No active file"
+  }
+}
+```
+
+---
+
+### GET /api/files/file/info
+
+Get information about a specific file.
+
+**CLI Command:** `obsidian file`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File name or path |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/file/info?file=Notes.md&vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/files?vault=youtube"
+```
+
+```bash
+curl "http://localhost:3000/api/files/files?folder=Projects&vault=youtube"
+```
+
+```bash
+curl "http://localhost:3000/api/files/files?ext=md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Projects/Notes.md",
+      "Daily/2026-05-09.md",
+      "Templates/daily.md"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/files/file/read
+
+Read the content of a specific file.
+
+**CLI Command:** `obsidian read`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File name or path |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/file/read?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "# My Notes\n\nThis is the content of my notes file."
+}
+```
+
+---
+
+### POST /api/files/file/open
+
+Open a file in the Obsidian editor.
+
+**CLI Command:** `obsidian open`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File name or path |
+| `path` | string | No | Full path to the file |
+| `newtab` | boolean | No | Open in new tab |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/open" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "vault": "youtube"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/create?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "NewNote.md",
+    "path": "Projects",
+    "content": "# New Note\n\nCreated via API"
+  }'
+```
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/create?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "DailyNote.md", "template": "daily"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Created: Projects/NewNote.md"
+  }
+}
+```
+
+---
+
+### POST /api/files/file/append
+
+Append content to an existing file.
+
+**CLI Command:** `obsidian append`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File name or path |
+| `path` | string | No | Full path to the file |
+| `content` | string | Yes | Content to append |
+| `inline` | boolean | No | Append inline (no newlines) |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/append?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "content": "\n\n## Added via API"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/prepend?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "content": "# Updated Notes\n"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/move?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "OldName.md", "to": "Archive/OldName.md"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/file/rename?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "name": "MyNotes.md"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:3000/api/files/file?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "OldNotes.md"}'
+```
+
+```bash
+curl -X DELETE "http://localhost:3000/api/files/file?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "OldNotes.md", "permanent": true}'
+```
+

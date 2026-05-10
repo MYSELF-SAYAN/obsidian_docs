@@ -1,0 +1,109 @@
+---
+title: API Reference
+description: Complete API reference for Obsidian SDK services.
+---
+
+# API Reference
+
+Complete API reference for Obsidian SDK services.
+
+## Services
+
+### Files & Vault
+
+- [Vault](./files/vault) — Vault configuration and management
+- [File](./files/file) — File read, write, and operations
+- [Daily](./files/daily) — Daily notes creation and management
+- [Templates](./files/templates) — Note template operations
+- [Workspace](./files/workspace) — Obsidian workspace control
+- [Search](./files/search) — Full-text search functionality
+- [Tags](./files/tags) — Tag management and operations
+- [Outline](./files/outline) — Document outline/navigation
+
+### Note Relationships
+
+- [Backlinks](./relationships/backlinks) — View and manage incoming links
+- [Links](./relationships/links) — Internal link operations
+
+### Content & Metadata
+
+- [Properties](./content/properties) — Frontmatter and note properties
+- [Aliases](./content/aliases) — Note alias management
+- [Tasks](./content/tasks) — Task and todo management
+- [Random](./content/random) — Random note selection
+
+### Platform Configuration
+
+- [Plugins](./platform/plugins) — Plugin management
+- [Themes](./platform/themes) — Theme installation and management
+- [Snippets](./platform/snippets) — CSS snippet management
+- [Sync](./platform/sync) — Obsidian Sync configuration
+- [Publish](./platform/publish) — Obsidian Publish site management
+
+### System & Utilities
+
+- [History](./utilities/history) — File history and recovery
+- [Diff](./utilities/diff) — Compare file versions
+- [Dev](./utilities/dev) — Developer tools and debugging
+- [Misc](./utilities/misc) — Version, word count, app control
+
+## Base URL
+
+All API endpoints use the base URL:
+```
+http://localhost:3000/api/
+```
+
+## Quick Start
+
+List all files in a vault:
+```bash
+curl "http://localhost:3000/api/files?vault=youtube"
+```
+
+Read a specific file:
+```bash
+curl "http://localhost:3000/api/file/read?file=Notes.md&vault=youtube"
+```
+
+Search for notes:
+```bash
+curl "http://localhost:3000/api/search?q=project&vault=youtube"
+```
+
+## Common Parameters
+
+Most endpoints support these parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `vault` | string | Target vault name (default: configured vault) |
+| `file` | string | Target file name |
+| `path` | string | Full path to file |
+
+## Response Format
+
+All responses follow a consistent format:
+
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message|list|kv",
+    "data": "..."
+  }
+}
+```
+
+| Type | Description |
+|------|-------------|
+| `message` | Single string value |
+| `list` | Array of values |
+| `kv` | Key-value object |
+
+## Getting Help
+
+- [Quick Start Guide](../quickstart) - Get started in 2 minutes
+- [Files & Vault](./files) - File operations
+- [Search](./files/search) - Full-text search
+- [Dev Tools](./utilities/dev) - Developer utilities

@@ -1,0 +1,155 @@
+---
+title: Templates
+description: Auto-generated API documentation.
+---
+
+# Templates Service
+
+List and work with note templates.
+
+## Service Overview
+
+The Templates service provides endpoints to list available templates, read template content, and insert templates into notes.
+
+## Base URL
+
+```
+/api/files/templates
+/api/files/template
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/templates
+
+List all available templates in the vault.
+
+**CLI Command:** `obsidian templates`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/templates?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "daily",
+      "meeting",
+      "project",
+      "journal"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/files/template/:name
+
+Read the content of a specific template.
+
+**CLI Command:** `obsidian template:read`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Template name |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `resolve` | boolean | No | Resolve template variables |
+| `title` | string | No | Title to use when resolving |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/template/daily?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "# {{title}}\n\nDate: {{date}}\nTime: {{time}}\n\n## Tasks\n- [ ] \n\n## Notes\n"
+}
+```
+
+**With variable resolution:**
+```bash
+curl "http://localhost:3000/api/files/template/meeting?resolve=true&title=Team+Sync&vault=youtube"
+```
+
+**Python (with resolution):**
+```python
+response = requests.get("http://localhost:3000/api/files/template/meeting", params={
+    "resolve": "true",
+    "title": "Team Sync",
+    "vault": "youtube"
+})
+```
+
+---
+
+### POST /api/files/template/:name/insert
+
+Insert a template into the active note or create a new note.
+
+**CLI Command:** `obsidian template:insert`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Template name to insert |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/template/meeting/insert?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```bash
+# Preview daily template with variables resolved
+curl -s "http://localhost:3000/api/files/template/daily?resolve=true&vault=youtube" \
+  | jq -r '.data'
+```
+
+```bash
+# Get all available templates
+curl -s "http://localhost:3000/api/files/templates?vault=youtube" \
+  | jq -r '.data.data[]'
+```
+
+```bash
+# Get template content
+TEMPLATE=$(curl -s "http://localhost:3000/api/files/template/project?vault=youtube" | jq -r '.data')
+
+# Create new file with template content
+curl -X POST "http://localhost:3000/api/file/create?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\": \"NewProject.md\", \"content\": $(echo "$TEMPLATE" | jq -Rs .)}"
+```
+

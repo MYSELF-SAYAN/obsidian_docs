@@ -1,0 +1,222 @@
+---
+title: Search
+description: Auto-generated API documentation.
+---
+
+# Search Service
+
+Search for notes and content within your Obsidian vault.
+
+## Service Overview
+
+The Search service provides full-text search capabilities, context retrieval, and search result navigation. It wraps Obsidian's powerful search functionality.
+
+## Base URL
+
+```
+/api/files/search
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/search
+
+Perform a text search across all notes in the vault.
+
+**CLI Command:** `obsidian search`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Search query string |
+| `path` | string | No | Limit search to specific folder |
+| `limit` | number | No | Maximum number of results |
+| `case` | boolean | No | Enable case-sensitive search |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/search?query=project&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Projects/TestNote.md",
+      "Projects/Notes.md",
+      "Archive/ProjectIdeas.md"
+    ]
+  }
+}
+```
+
+**With path filter:**
+```bash
+curl "http://localhost:3000/api/files/search?query=test&path=Projects&vault=youtube"
+```
+
+**Python (with path filter):**
+```python
+response = requests.get("http://localhost:3000/api/files/search", params={
+    "query": "test",
+    "path": "Projects",
+    "vault": "youtube"
+})
+```
+
+**With limit:**
+```bash
+curl "http://localhost:3000/api/files/search?query=notes&limit=10&vault=youtube"
+```
+
+**Python (with limit):**
+```python
+response = requests.get("http://localhost:3000/api/files/search", params={
+    "query": "notes",
+    "limit": 10,
+    "vault": "youtube"
+})
+```
+
+**Case-sensitive search:**
+```bash
+curl "http://localhost:3000/api/files/search?query=Test&case=true&vault=youtube"
+```
+
+**Python (case-sensitive):**
+```python
+response = requests.get("http://localhost:3000/api/files/search", params={
+    "query": "Test",
+    "case": "true",
+    "vault": "youtube"
+})
+```
+
+---
+
+### GET /api/files/search/context
+
+Search with surrounding context lines for each match.
+
+**CLI Command:** `obsidian search:context`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Search query string |
+| `path` | string | No | Limit search to specific folder |
+| `limit` | number | No | Maximum number of results |
+| `case` | boolean | No | Enable case-sensitive search |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/search/context?query=important&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Projects/Notes.md:\n- This is an **important** note about...",
+  }
+}
+```
+
+---
+
+### POST /api/files/search/open
+
+Open search results in the Obsidian search panel.
+
+**CLI Command:** `obsidian search:open`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | Search query to display |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/search/open" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "project", "vault": "youtube"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Opening search for: project"
+}
+```
+
+---
+
+## Search Operators
+
+The Obsidian search supports various operators:
+
+| Operator | Example | Description |
+|----------|---------|-------------|
+| `-tag:` | `-tag:done` | Exclude tag |
+| `file:` | `file:\"*.md\"` | Search in specific file |
+| `path:` | `path:Projects` | Search in path |
+| `line:` | `line:5` | Match specific line |
+| `"quotes"` | `"exact phrase"` | Exact phrase match |
+
+**Example with operators:**
+```bash
+curl "http://localhost:3000/api/files/search?query=project%20tag:daily&vault=youtube"
+```
+
+## Error Handling
+
+**Empty Query:**
+```json
+{
+  "success": false,
+  "error": "Query parameter is required"
+}
+```
+
+**No Results:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": []
+  }
+}
+```
+
+## Related Services
+
+- [Tags Service](./tags) - Tag-based navigation
+- [File Service](./file) - Read file content
+- [Links Service](../relationships/links) - Link analysis
+
+## Notes
+
+- Search is case-insensitive by default
+- Supports full Obsidian search syntax
+- Results are relative file paths from vault root

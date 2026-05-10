@@ -1,0 +1,122 @@
+---
+title: Diff
+description: Auto-generated API documentation.
+---
+
+# Diff Service
+
+Compare file versions and see changes between versions.
+
+## Service Overview
+
+The Diff service provides endpoints to compare current file content with historical versions, showing what changed between versions.
+
+## Base URL
+
+```
+/api/utilities/diff
+```
+
+## Endpoints
+
+---
+
+### GET /api/utilities/diff
+
+Compare current content with a historical version.
+
+**CLI Command:** `obsidian diff`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file |
+| `path` | string | No | Full path |
+| `from` | string | No | Start timestamp or version |
+| `to` | string | No | End timestamp or version |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/diff?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "- Removed old line\n+ Added new line"
+  }
+}
+```
+
+**Compare specific versions:**
+```bash
+curl "http://localhost:3000/api/utilities/diff?file=Notes.md&from=2026-05-08&to=2026-05-09&vault=youtube"
+```
+
+**Python (specific versions):**
+```python
+response = requests.get("http://localhost:3000/api/utilities/diff", params={
+    "file": "Notes.md",
+    "from": "2026-05-08",
+    "to": "2026-05-09",
+    "vault": "youtube"
+})
+```
+
+---
+
+### GET /api/utilities/diff/compare
+
+Compare two specific versions (explicit endpoint).
+
+**CLI Command:** `obsidian diff`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file |
+| `path` | string | No | Full path |
+| `from` | string | Yes | Start version/timestamp |
+| `to` | string | Yes | End version/timestamp |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/diff/compare?file=Notes.md&from=2026-05-08T10:00:00&to=2026-05-08T16:00:00&vault=youtube"
+```
+
+```bash
+# Show all changes since yesterday
+curl -s "http://localhost:3000/api/utilities/diff?file=Notes.md&vault=youtube" \
+  | jq -r '.data.data'
+```
+
+```bash
+# Show changes between two timestamps
+curl -s "http://localhost:3000/api/utilities/diff/compare?file=Notes.md&from=2026-05-08T09:00:00&to=2026-05-08T17:00:00&vault=youtube" \
+  | jq -r '.data.data'
+```
+
+```bash
+# Create a simple change log
+FILES=("Notes.md" "Projects/Overview.md" "Archive/Legacy.md")
+for file in "${FILES[@]}"; do
+  echo "=== $file ==="
+  curl -s "http://localhost:3000/api/utilities/diff?file=$file&vault=youtube" \
+    | jq -r '.data.data'
+  echo ""
+done
+```
+

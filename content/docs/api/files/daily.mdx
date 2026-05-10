@@ -1,0 +1,193 @@
+---
+title: Daily
+description: Auto-generated API documentation.
+---
+
+# Daily Service
+
+Manage daily notes - create, read, append, and prepend content.
+
+## Service Overview
+
+The Daily service provides specialized endpoints for working with Obsidian's daily notes feature. Daily notes are timestamped notes typically stored in a daily folder.
+
+## Base URL
+
+```
+/api/files/daily
+```
+
+## Endpoints
+
+---
+
+### POST /api/files/daily
+
+Create and open today's daily note.
+
+**CLI Command:** `obsidian daily`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `paneType` | string | No | Type of pane to open in |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/daily?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Opening daily note"
+  }
+}
+```
+
+**With pane type:**
+```bash
+curl -X POST "http://localhost:3000/api/files/daily?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"paneType": "right"}'
+```
+
+**Python (with pane type):**
+```python
+response = requests.post("http://localhost:3000/api/files/daily", params={"vault": "youtube"}, json={
+    "paneType": "right"
+})
+```
+
+---
+
+### GET /api/files/daily/path
+
+Get the file path for today's daily note.
+
+**CLI Command:** `obsidian daily:path`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/daily/path?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "C:\\Users\\sayan\\Documents\\youtube\\Daily\\2026-05-09.md"
+}
+```
+
+---
+
+### GET /api/files/daily/read
+
+Read the content of today's daily note.
+
+**CLI Command:** `obsidian daily:read`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/daily/read?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "# 2026-05-09\n\n## Tasks\n- [ ] Review notes\n\n## Notes\nStarted working on the API documentation."
+  }
+}
+```
+
+---
+
+### POST /api/files/daily/append
+
+Append content to today's daily note.
+
+**CLI Command:** `obsidian daily:append`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `content` | string | Yes | Content to append |
+| `paneType` | string | No | Type of pane |
+| `inline` | boolean | No | Append inline (no newlines) |
+| `open` | boolean | No | Open after appending |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/daily/append?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "## End of Day\n\nCompleted API documentation."
+  }'
+```
+
+```bash
+curl -X POST "http://localhost:3000/api/files/daily/append?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Updated at 5pm",
+    "inline": true
+  }'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/daily/prepend?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "# Daily Note\n\n## Morning Planning"
+  }'
+```
+
+```bash
+# Start your day by prepending a morning section
+curl -X POST "http://localhost:3000/api/files/daily/prepend?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "# 2026-05-09\n\n## Morning\n- [ ] Review tasks\n- [ ] Check emails\n\n"
+  }'
+```
+
+```bash
+# Add end-of-day summary
+curl -X POST "http://localhost:3000/api/files/daily/append?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "## Evening Review\n\nCompleted:\n- [ ] API docs\n\nPending:\n- [ ] Code review\n"
+  }'
+```
+
+```bash
+# Quick task update
+curl -X POST "http://localhost:3000/api/files/daily/append?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "- [x] Finished meeting notes"}'
+```
+

@@ -1,0 +1,191 @@
+---
+title: Random
+description: Auto-generated API documentation.
+---
+
+# Random Service
+
+Open or read a random note from your vault.
+
+## Service Overview
+
+The Random service provides endpoints to discover new content by selecting random notes from your vault. Useful for spaced repetition, random journaling, or exploration.
+
+## Base URL
+
+```
+/api/content/random
+```
+
+## Endpoints
+
+---
+
+### POST /api/content/random
+
+Open a random note in the Obsidian editor.
+
+**CLI Command:** `obsidian random`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `folder` | string | No | Limit selection to specific folder |
+| `newtab` | boolean | No | Open in new tab |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/content/random?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Opening random note"
+  }
+}
+```
+
+**From specific folder:**
+```bash
+curl -X POST "http://localhost:3000/api/content/random?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"folder": "Projects"}'
+```
+
+**Python (from specific folder):**
+```python
+response = requests.post("http://localhost:3000/api/content/random", params={"vault": "youtube"}, json={
+    "folder": "Projects"
+})
+```
+
+**Open in new tab:**
+```bash
+curl -X POST "http://localhost:3000/api/content/random?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"newtab": true}'
+```
+
+**Python (open in new tab):**
+```python
+response = requests.post("http://localhost:3000/api/content/random", params={"vault": "youtube"}, json={
+    "newtab": True
+})
+```
+
+---
+
+### GET /api/content/random/read
+
+Read the content of a random note without opening it.
+
+**CLI Command:** `obsidian random:read`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `folder` | string | No | Limit selection to specific folder |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/content/random/read?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "# Random Note Title\n\nContent of the randomly selected note..."
+  }
+}
+```
+
+**From specific folder:**
+```bash
+curl "http://localhost:3000/api/content/random/read?folder=Archive&vault=youtube"
+```
+
+**Python (from specific folder):**
+```python
+response = requests.get("http://localhost:3000/api/content/random/read", params={
+    "folder": "Archive",
+    "vault": "youtube"
+})
+```
+
+---
+
+## Use Cases
+
+### Spaced Repetition / Flashcard Review
+
+```bash
+# Randomly select a note to review
+RESPONSE=$(curl -s "http://localhost:3000/api/content/random/read?vault=youtube")
+echo "$RESPONSE"
+```
+
+### Random Writing Prompt
+
+```bash
+# Get a random note to use as a writing prompt
+curl -s "http://localhost:3000/api/content/random/read?vault=youtube" \
+  | jq -r '.data.data'
+```
+
+### Knowledge Exploration
+
+```bash
+# Discover notes from a specific category
+curl -X POST "http://localhost:3000/api/content/random?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"folder": "Learning"}'
+```
+
+---
+
+## Error Handling
+
+**Empty Vault:**
+```json
+{
+  "success": false,
+  "error": "No notes found in vault"
+}
+```
+
+**Empty Folder:**
+```json
+{
+  "success": false,
+  "error": "No notes found in specified folder"
+}
+```
+
+## Related Services
+
+- [File Service](./file) - Read file content
+- [Search Service](../files/search) - Targeted search
+- [Tabs Service](../files/workspace) - Manage open tabs
+
+## Notes
+
+- Selection is truly random across eligible notes
+- Excludes the daily notes folder by default
+- Newtab parameter opens in background tab

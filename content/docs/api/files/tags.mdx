@@ -1,0 +1,208 @@
+---
+title: Tags
+description: Auto-generated API documentation.
+---
+
+# Tags Service
+
+List and explore tags across your vault.
+
+## Service Overview
+
+The Tags service provides endpoints to discover, list, and explore tags throughout your Obsidian vault. Tags help organize content and enable navigation.
+
+## Base URL
+
+```
+/api/files/tags
+/api/files/tag
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/tags
+
+List all tags used in the vault.
+
+**CLI Command:** `obsidian tags`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sort` | string | No | Sort order: "alphabetical" or "frequency" |
+| `counts` | boolean | No | Include usage count per tag |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/tags?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "project",
+      "important",
+      "daily",
+      "read",
+      "archive"
+    ]
+  }
+}
+```
+
+**With counts:**
+```bash
+curl "http://localhost:3000/api/files/tags?counts=true&vault=youtube"
+```
+
+**Python (with counts):**
+```python
+response = requests.get("http://localhost:3000/api/files/tags", params={
+    "counts": "true",
+    "vault": "youtube"
+})
+```
+
+**Alphabetical sort:**
+```bash
+curl "http://localhost:3000/api/files/tags?sort=alphabetical&vault=youtube"
+```
+
+**Frequency sort:**
+```bash
+curl "http://localhost:3000/api/files/tags?sort=frequency&vault=youtube"
+```
+
+---
+
+### GET /api/files/tag/:name
+
+Get detailed information about a specific tag.
+
+**CLI Command:** `obsidian tag`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Name of the tag (without #) |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/tag/project?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Tag: #project\n\nFound in:\n- Projects/Overview.md\n- Archive/ProjectPlan.md"
+  }
+}
+```
+
+---
+
+## Tag Naming Conventions
+
+Obsidian tags use the `#` prefix, but when calling the API, omit the hash:
+
+| Tag | API Parameter |
+|-----|---------------|
+| `#project` | `name=project` |
+| `#daily/notes` | `name=daily/notes` |
+| `#area/work` | `name=area/work` |
+
+## Nested Tags
+
+Obsidian supports nested tags with `/`:
+
+```bash
+# List all tags (shows nested structure)
+curl "http://localhost:3000/api/files/tags?vault=youtube"
+
+# Get specific nested tag
+curl "http://localhost:3000/api/files/tag/daily/journal?vault=youtube"
+```
+
+## Use Cases
+
+### Building a Tag Cloud
+
+```bash
+# Get all tags with counts for tag cloud
+curl -s "http://localhost:3000/api/files/tags?counts=true&vault=youtube" \
+  | jq '.data.data'
+```
+
+### Finding Related Notes
+
+```bash
+# Find all notes with a specific tag
+TAG="project"
+curl -s "http://localhost:3000/api/files/tag/$TAG?vault=youtube" \
+  | jq -r '.data.data'
+```
+
+### Tag-based Navigation
+
+```bash
+# Generate navigation links
+TAGS=$(curl -s "http://localhost:3000/api/files/tags?vault=youtube" | jq -r '.data.data[]')
+for TAG in $TAGS; do
+  echo "Tag: #$TAG"
+done
+```
+
+---
+
+## Error Handling
+
+**Tag Not Found:**
+```json
+{
+  "success": false,
+  "error": "Tag not found: nonexistent"
+}
+```
+
+**Invalid Tag Format:**
+```json
+{
+  "success": false,
+  "error": "Invalid tag name"
+}
+```
+
+## Related Services
+
+- [Search Service](./search) - Search by tag
+- [Tasks Service](../content/tasks) - Tag tasks
+- [Links Service](../relationships/links) - Analyze connections
+
+## Notes
+
+- Tags are case-insensitive
+- Nested tags use `/` as separator
+- Tags must be valid filename characters

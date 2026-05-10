@@ -1,0 +1,148 @@
+---
+title: Outline
+description: Auto-generated API documentation.
+---
+
+# Outline Service
+
+Extract and view document outlines/headings structure.
+
+## Service Overview
+
+The Outline service provides endpoints to extract the heading structure of notes, useful for building navigation, table of contents, or analyzing document organization.
+
+## Base URL
+
+```
+/api/files/outline
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/outline
+
+Get the heading structure of a file.
+
+**CLI Command:** `obsidian outline`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file name |
+| `path` | string | No | Full path to the file |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/outline?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "# Main Title\n## Section One\n### Subsection 1.1\n### Subsection 1.2\n## Section Two\n## Section Three"
+  }
+}
+```
+
+**Using path:**
+```bash
+curl "http://localhost:3000/api/files/outline?path=Projects/Overview.md&vault=youtube"
+```
+
+**Python (using path):**
+```python
+response = requests.get("http://localhost:3000/api/files/outline", params={
+    "path": "Projects/Overview.md",
+    "vault": "youtube"
+})
+```
+
+**With format:**
+```bash
+curl "http://localhost:3000/api/files/outline?file=Notes.md&format=json&vault=youtube"
+```
+
+---
+
+## Use Cases
+
+### Build Table of Contents
+
+```bash
+# Extract outline for TOC generation
+curl -s "http://localhost:3000/api/files/outline?file=Notes.md&vault=youtube" \
+  | jq -r '.data.data' \
+  | while read line; do
+    level=$(echo "$line" | grep -o "^#" | wc -c)
+    text=$(echo "$line" | sed 's/^#* //')
+    indent=$((level - 1))
+    printf "%*s- %s\n" $indent "" "$text"
+  done
+```
+
+### Document Analysis
+
+```bash
+# Count headings by level
+curl -s "http://localhost:3000/api/files/outline?file=Notes.md&vault=youtube" \
+  | jq -r '.data.data' \
+  | awk '/^#/{print length($0) - length($1)}'
+```
+
+### Navigation Generator
+
+```bash
+# Generate navigation links
+curl -s "http://localhost:3000/api/files/outline?file=Notes.md&vault=youtube" \
+  | jq -r '.data.data' \
+  | while read line; do
+    slug=$(echo "$line" | sed 's/^#* //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+    echo "[$slug](#$slug)"
+  done
+```
+
+---
+
+## Error Handling
+
+**File Not Found:**
+```json
+{
+  "success": false,
+  "error": "File not found: Notes.md"
+}
+```
+
+**No Headings:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": ""
+  }
+}
+```
+
+## Related Services
+
+- [Properties Service](../content/properties) - File metadata
+- [File Service](./file) - Read full content
+- [Search Service](./search) - Find files
+
+## Notes
+
+- Headings are extracted in document order
+- Heading levels are determined by the number of `#` characters
+- Empty files return empty outline
+- Works best with properly structured Markdown

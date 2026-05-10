@@ -1,0 +1,221 @@
+---
+title: Dev
+description: Auto-generated API documentation.
+---
+
+# Dev Service
+
+Developer tools for debugging and inspecting Obsidian.
+
+## Service Overview
+
+The Dev service provides endpoints for developers to debug Obsidian, inspect DOM, view console output, capture screenshots, and interact with Obsidian's internal systems.
+
+## Warning
+
+These endpoints are intended for development and debugging purposes. Some operations may have side effects or require development mode to be enabled in Obsidian.
+
+## Base URL
+
+```
+/api/utilities/dev
+/api/utilities/devtools
+```
+
+## Endpoints
+
+---
+
+### POST /api/utilities/devtools
+
+Toggle developer tools panel.
+
+**CLI Command:** `obsidian devtools`
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/devtools"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Developer tools toggled"
+}
+```
+
+---
+
+### POST /api/utilities/dev/debug
+
+Toggle debug mode or perform debug action.
+
+**CLI Command:** `obsidian dev:debug`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `action` | string | No | Debug action to perform |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/dev/debug" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "start"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/dev/cdp" \
+  -H "Content-Type: application/json" \
+  -d '{"method": "Runtime.evaluate", "params": {"expression": "1+1"}}'
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/errors?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Error: Plugin 'example' failed to load",
+      "Warning: Slow search operation"
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/utilities/dev/errors/clear
+
+Clear the error log.
+
+**CLI Command:** `obsidian dev:errors clear`
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/dev/errors/clear"
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/screenshot?path=screenshot.png&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Screenshot saved: screenshot.png"
+}
+```
+
+---
+
+### GET /api/utilities/dev/console
+
+Get console output from Obsidian.
+
+**CLI Command:** `obsidian dev:console`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `limit` | number | No | Number of entries |
+| `level` | string | No | Filter by level (log, warn, error) |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/console?vault=youtube"
+```
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/console?level=error&vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/dev/console/clear"
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/css?selector=.nav-folder-title&vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/dom?selector=.nav-folder-title&text=true&vault=youtube"
+```
+
+```bash
+curl "http://localhost:3000/api/utilities/dev/dom?selector=a&attr=href&vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/dev/mobile" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "on"}'
+```
+
+```bash
+# Watch for errors
+while true; do
+  ERRORS=$(curl -s "http://localhost:3000/api/utilities/dev/errors?vault=youtube" | jq -r '.data.data[]')
+  if [ -n "$ERRORS" ]; then
+    echo "=== Errors Found ==="
+    echo "$ERRORS"
+  fi
+  sleep 5
+done
+```
+
+```bash
+# Get all nav folder titles
+curl -s "http://localhost:3000/api/utilities/dev/dom?selector=.nav-folder-title&text=true&vault=youtube" \
+  | jq -r '.data.data[]'
+```
+
+```bash
+# Take screenshot after an operation
+curl -X POST "http://localhost:3000/api/file/open?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md"}'
+
+curl "http://localhost:3000/api/utilities/dev/screenshot?path=after-open.png&vault=youtube"
+```
+

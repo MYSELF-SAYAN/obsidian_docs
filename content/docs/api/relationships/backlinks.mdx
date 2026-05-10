@@ -1,0 +1,181 @@
+---
+title: Backlinks
+description: Auto-generated API documentation.
+---
+
+# Backlinks Service
+
+View incoming links and outgoing links for files.
+
+## Service Overview
+
+The Backlinks service provides endpoints to analyze links between notes. Backlinks show what other notes reference a specific file, while outgoing links show what a file links to.
+
+## Base URL
+
+```
+/api/relationships/backlinks
+/api/relationships/backlinks/outgoing
+```
+
+## Endpoints
+
+---
+
+### GET /api/relationships/backlinks
+
+Get all files that link to a specific file (backlinks).
+
+**CLI Command:** `obsidian backlinks`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file name or path |
+| `path` | string | No | Full path to the file |
+| `counts` | boolean | No | Include link counts |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/relationships/backlinks?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Projects/Overview.md",
+      "Daily/2026-05-09.md"
+    ]
+  }
+}
+```
+
+**With counts:**
+```bash
+curl "http://localhost:3000/api/relationships/backlinks?file=Notes.md&counts=true&vault=youtube"
+```
+
+**Python (with counts):**
+```python
+response = requests.get("http://localhost:3000/api/relationships/backlinks", params={
+    "file": "Notes.md",
+    "counts": "true",
+    "vault": "youtube"
+})
+```
+
+**Using path:**
+```bash
+curl "http://localhost:3000/api/relationships/backlinks?path=C:/vault/Notes.md&vault=youtube"
+```
+
+---
+
+### GET /api/relationships/backlinks/outgoing
+
+Get all files that a specific file links to (outgoing links).
+
+**CLI Command:** `obsidian links`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Source file name or path |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/relationships/backlinks/outgoing?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Projects/Overview.md",
+      "Templates/daily.md",
+      "Archive/Legacy.md"
+    ]
+  }
+}
+```
+
+---
+
+## Use Cases
+
+### Graph Analysis
+
+```bash
+# Analyze link network
+SOURCE="Notes.md"
+BACKLINKS=$(curl -s "http://localhost:3000/api/relationships/backlinks?file=$SOURCE&vault=youtube" \
+  | jq -r '.data.data[]')
+OUTGOING=$(curl -s "http://localhost:3000/api/relationships/backlinks/outgoing?file=$SOURCE&vault=youtube" \
+  | jq -r '.data.data[]')
+
+echo "Backlinks to $SOURCE:"
+echo "$BACKLINKS"
+echo ""
+echo "Links from $SOURCE:"
+echo "$OUTGOING"
+```
+
+### Find Unlinked References
+
+```bash
+# Find potential backlinks by searching for filename
+curl -s "http://localhost:3000/api/search?query=Notes&vault=youtube" \
+  | jq -r '.data.data[]'
+```
+
+---
+
+## Error Handling
+
+**File Not Found:**
+```json
+{
+  "success": false,
+  "error": "File not found: Notes.md"
+}
+```
+
+**No Links:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": []
+  }
+}
+```
+
+## Related Services
+
+- [Links Service](./links) - Advanced link analysis
+- [Search Service](../files/search) - Content search
+- [Orphans Service](./links) - Find unlinked files
+
+## Notes
+
+- Links include wiki-links `[[Notes]]` and markdown links `[text](Notes.md)`
+- Unresolved links (to non-existent files) are tracked separately
+- Path parameters should be relative to vault root

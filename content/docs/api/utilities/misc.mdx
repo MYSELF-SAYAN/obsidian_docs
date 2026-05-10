@@ -1,0 +1,206 @@
+---
+title: Miscellaneous
+description: Auto-generated API documentation.
+---
+
+# Miscellaneous Service
+
+Utility endpoints for version, word count, reload, restart, and web access.
+
+## Service Overview
+
+The Misc service provides general utility endpoints for app information, word counting, app control, and web access.
+
+## Base URL
+
+```
+/api/utilities/version
+/api/utilities/wordcount
+/api/utilities/reload
+/api/utilities/restart
+/api/utilities/web
+```
+
+## Endpoints
+
+---
+
+### GET /api/utilities/version
+
+Get the Obsidian version information.
+
+**CLI Command:** `obsidian version`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/version"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "1.12.7 (installer 1.12.7)"
+  }
+}
+```
+
+---
+
+### GET /api/utilities/wordcount
+
+Get word count statistics for a file or the entire vault.
+
+**CLI Command:** `obsidian wordcount`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Specific file |
+| `path` | string | No | Full path to file |
+| `words` | boolean | No | Include word count |
+| `characters` | boolean | No | Include character count |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/utilities/wordcount?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "kv",
+    "data": {
+      "words": "1250",
+      "characters": "7234"
+    }
+  }
+}
+```
+
+**With explicit options:**
+```bash
+curl "http://localhost:3000/api/utilities/wordcount?file=Notes.md&words=true&characters=true&vault=youtube"
+```
+
+**Python (with explicit options):**
+```python
+response = requests.get("http://localhost:3000/api/utilities/wordcount", params={
+    "file": "Notes.md",
+    "words": "true",
+    "characters": "true",
+    "vault": "youtube"
+})
+```
+
+---
+
+### POST /api/utilities/reload
+
+Reload the Obsidian application.
+
+**CLI Command:** `obsidian reload`
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/reload"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Reloading Obsidian..."
+}
+```
+
+---
+
+### POST /api/utilities/restart
+
+Restart the Obsidian application.
+
+**CLI Command:** `obsidian restart`
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/restart"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Restarting Obsidian..."
+}
+```
+
+---
+
+### POST /api/utilities/web
+
+Open a URL in the Obsidian web viewer.
+
+**CLI Command:** `obsidian web`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `url` | string | Yes | URL to open |
+| `newtab` | boolean | No | Open in new tab |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/web" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://obsidian.md"}'
+```
+
+```bash
+curl -X POST "http://localhost:3000/api/utilities/web" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "newtab": true}'
+```
+
+```bash
+# Get word count for daily note
+curl -s "http://localhost:3000/api/utilities/wordcount?file=Daily/2026-05-09.md&vault=youtube" \
+  | jq -r '.data.data'
+
+# Sum up weekly words
+TOTAL=0
+for day in 05 06 07 08 09; do
+  WORDS=$(curl -s "http://localhost:3000/api/utilities/wordcount?file=Daily/2026-05-$day.md&vault=youtube" \
+    | jq -r '.data.data.words // 0')
+  TOTAL=$((TOTAL + WORDS))
+done
+echo "Weekly total: $TOTAL words"
+```
+
+```bash
+# Check Obsidian is running
+VERSION=$(curl -s "http://localhost:3000/api/utilities/version" | jq -r '.data.data')
+if [ $? -eq 0 ]; then
+  echo "Obsidian running: $VERSION"
+else
+  echo "Obsidian not responding"
+fi
+```
+

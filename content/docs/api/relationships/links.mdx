@@ -1,0 +1,283 @@
+---
+title: Links
+description: Auto-generated API documentation.
+---
+
+# Links Service
+
+Analyze link networks, find unresolved links, orphans, and dead ends.
+
+## Service Overview
+
+The Links service provides comprehensive link analysis including all links, unresolved references, orphaned files (no backlinks), and dead ends (files no other files link to).
+
+## Base URL
+
+```
+/api/relationships/links
+/api/relationships/unresolved
+/api/relationships/orphans
+/api/relationships/deadends
+```
+
+## Endpoints
+
+---
+
+### GET /api/relationships/links
+
+List all links across the vault or for a specific file.
+
+**CLI Command:** `obsidian links`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Get links from specific file |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/relationships/links?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Projects/Overview.md",
+      "Daily/2026-05-09.md",
+      "Templates/daily.md"
+    ]
+  }
+}
+```
+
+**Links from specific file:**
+```bash
+curl "http://localhost:3000/api/relationships/links?file=Notes.md&vault=youtube"
+```
+
+**Python (from specific file):**
+```python
+response = requests.get("http://localhost:3000/api/relationships/links", params={
+    "file": "Notes.md",
+    "vault": "youtube"
+})
+```
+
+---
+
+### GET /api/relationships/unresolved
+
+Find links that point to non-existent files.
+
+**CLI Command:** `obsidian unresolved`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `total` | boolean | No | Include total count |
+| `counts` | boolean | No | Include counts per file |
+| `verbose` | boolean | No | Include full link context |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/relationships/unresolved?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Notes.md -> MissingFile.md",
+      "Projects/Overview.md -> OldNote.md"
+    ]
+  }
+}
+```
+
+**With counts:**
+```bash
+curl "http://localhost:3000/api/relationships/unresolved?counts=true&vault=youtube"
+```
+
+**Verbose output:**
+```bash
+curl "http://localhost:3000/api/relationships/unresolved?verbose=true&vault=youtube"
+```
+
+---
+
+### GET /api/relationships/orphans
+
+Find files with no incoming links (no backlinks).
+
+**CLI Command:** `obsidian orphans`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `total` | boolean | No | Include total count |
+| `all` | boolean | No | Include all orphan files |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/relationships/orphans?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Archive/OldNotes.md",
+      "Scratch/Random.md"
+    ]
+  }
+}
+```
+
+**With total count:**
+```bash
+curl "http://localhost:3000/api/relationships/orphans?total=true&vault=youtube"
+```
+
+**Include all (including system files):**
+```bash
+curl "http://localhost:3000/api/relationships/orphans?all=true&vault=youtube"
+```
+
+---
+
+### GET /api/relationships/deadends
+
+Find files that no other files link to.
+
+**CLI Command:** `obsidian deadends`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `total` | boolean | No | Include total count |
+| `all` | boolean | No | Include all dead ends |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/relationships/deadends?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Index.md",
+      "About.md"
+    ]
+  }
+}
+```
+
+**With total:**
+```bash
+curl "http://localhost:3000/api/relationships/deadends?total=true&vault=youtube"
+```
+
+---
+
+## Use Cases
+
+### Link Health Check
+
+```bash
+# Check for broken links
+echo "=== Unresolved Links ==="
+curl -s "http://localhost:3000/api/relationships/unresolved?vault=youtube" | jq '.data'
+
+echo ""
+echo "=== Orphan Files ==="
+curl -s "http://localhost:3000/api/relationships/orphans?vault=youtube" | jq '.data'
+```
+
+### Vault Analysis Report
+
+```bash
+# Generate comprehensive link report
+echo "# Vault Link Analysis"
+echo ""
+echo "## All Links"
+curl -s "http://localhost:3000/api/relationships/links?vault=youtube" | jq '.data.data | length'
+
+echo "## Unresolved Links"
+curl -s "http://localhost:3000/api/relationships/unresolved?vault=youtube" | jq '.data.data | length'
+
+echo "## Orphan Files"
+curl -s "http://localhost:3000/api/relationships/orphans?vault=youtube" | jq '.data.data | length'
+
+echo "## Dead Ends"
+curl -s "http://localhost:3000/api/relationships/deadends?vault=youtube" | jq '.data.data | length'
+```
+
+---
+
+## Error Handling
+
+**Vault Analysis Running:**
+```json
+{
+  "success": false,
+  "error": "Vault is being analyzed, please wait"
+}
+```
+
+**Empty Results:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": []
+  }
+}
+```
+
+## Related Services
+
+- [Backlinks Service](./backlinks) - Per-file link analysis
+- [Search Service](../files/search) - Content search
+- [Graph Service](../platform/plugins) - Visual graph analysis
+
+## Notes
+
+- Orphans have no incoming links from any other file
+- Dead ends are the opposite - files nothing links to
+- Daily notes and templates are often excluded from orphan analysis
+- Unresolved links include both `[[broken]]` and `[text](broken.md)`

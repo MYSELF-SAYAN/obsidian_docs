@@ -1,45 +1,130 @@
-# obsidian-docs
+# Obsidian SDK Documentation
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Comprehensive documentation for the Obsidian SDK - a powerful CLI tool and TypeScript library for interacting with Obsidian vaults programmatically.
 
-Run development server:
+## What is Obsidian SDK?
+
+Obsidian SDK enables developers to programmatically interact with Obsidian through a REST API and TypeScript library. Whether you want to automate note creation, manage vault settings, search content, or integrate Obsidian with other tools, this SDK provides everything you need.
+
+### Features
+
+- **REST API** - Full-featured API server with 23+ service endpoints
+- **TypeScript Library** - Easy-to-use TypeScript wrapper for all API methods
+- **Vault Management** - List, open, and manage Obsidian vaults
+- **File Operations** - Read, write, create, move, rename, and delete notes
+- **Search** - Full-text search across your vault
+- **Metadata Management** - Work with frontmatter, aliases, tags, and properties
+- **Task Management** - Create and track tasks within notes
+- **Link Analysis** - Explore backlinks, outgoing links, and orphans
+- **Plugin & Theme Management** - Install and manage Obsidian plugins and themes
+- **Developer Tools** - Debug mode, DOM inspection, and screenshots
+
+## Quick Start
+
+### Prerequisites
+
+- **Node.js** 18.x or higher
+- **npm** 9.x or higher
+- **Obsidian** installed on your system
+- **Obsidian CLI** available in your PATH
+
+### Installation
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+git clone https://github.com/MYSELF-SAYAN/obsidian_cli_sdk.git
+cd obsidian-sdk
+npm install
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+### Start the Server
 
-## Explore
+```bash
+npm run server
+# or
+npx obsidian server
+```
 
-In the project, you can see:
+The API server starts on `http://localhost:3000`.
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+### Using the SDK
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+```typescript
+import { Obsidian } from "obsidian-sdk";
 
-### Fumadocs MDX
+// Connect to your vault
+const obsidian = new Obsidian({ vault: "myVault" });
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+// List all files
+const files = await obsidian.files.list();
+console.log(files);
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+// Search for notes
+const results = await obsidian.search.query("project");
+console.log(results);
+```
 
-## Learn More
+## API Services
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+### Files & Vault (8 services)
+- **Vault** - Vault configuration and management
+- **File** - File read, write, and operations
+- **Daily** - Daily notes creation and management
+- **Templates** - Note template operations
+- **Workspace** - Workspace and tab management
+- **Search** - Full-text search functionality
+- **Tags** - Tag management and operations
+- **Outline** - Document outline/navigation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+### Note Relationships (2 services)
+- **Backlinks** - View and manage incoming links
+- **Links** - Internal link operations
+
+### Content & Metadata (4 services)
+- **Properties** - Frontmatter and note properties
+- **Aliases** - Note alias management
+- **Tasks** - Task and todo management
+- **Random** - Random note selection
+
+### Platform Configuration (5 services)
+- **Plugins** - Plugin management
+- **Themes** - Theme installation and management
+- **Snippets** - CSS snippet management
+- **Sync** - Obsidian Sync configuration
+- **Publish** - Obsidian Publish site management
+
+### System & Utilities (4 services)
+- **History** - File history and recovery
+- **Diff** - Compare file versions
+- **Dev** - Developer tools and debugging
+- **Misc** - Version, word count, app control
+
+## Documentation
+
+For full documentation, visit our [documentation site](http://localhost:3000/docs).
+
+## Repository Structure
+
+```
+obsidian-sdk/
+├── content/docs/          # Documentation source
+│   ├── api/              # API reference documentation
+│   └── core/             # Core concept documentation
+├── src/
+│   ├── app/              # Next.js application
+│   └── lib/              # Shared libraries
+└── package.json
+```
+
+## Contributing
+
+Contributions are welcome! Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to get involved.
+
+## License
+
+MIT License - see individual repositories for details.
+
+## Links
+
+- [SDK Repository](https://github.com/MYSELF-SAYAN/obsidian_cli_sdk)
+- [API Repository](https://github.com/MYSELF-SAYAN/obsidian_cli_api)
+- [Issues](https://github.com/MYSELF-SAYAN/obsidian_cli_sdk/issues)

@@ -662,27 +662,38 @@ export const GridFooter = () => {
             href="/docs"
             className="text-xl font-medium flex items-center gap-2 text-foreground hover:text-violet-400 transition-colors group/link"
           >
-            Documentation
+            SDK Documentation
 
             <ArrowUpRight
               className="opacity-0 group-hover/link:opacity-100 transition-opacity"
               size={16}
             />
           </Link>
+          <Link
+            href="/docs/api"
+            className="text-xl font-medium flex items-center gap-2 text-foreground hover:text-violet-400 transition-colors group/link"
+          >
+            API Documentation
 
+            <ArrowUpRight
+              className="opacity-0 group-hover/link:opacity-100 transition-opacity"
+              size={16}
+            />
+          </Link>
         </div>
 
         {/* Socials Column */}
         <div className="p-12 flex flex-col gap-6 group hover:bg-muted/20 transition-colors duration-500">
 
           <span className="text-muted-foreground font-mono text-sm tracking-wider">
-            COMMUNITY
+            SOCIALS
           </span>
 
           {[
             { name: "GitHub", url: "https://github.com/MYSELF-SAYAN/obsidian_cli_sdk" },
-            { name: "Reddit", url: "https://reddit.com" },
-            { name: "Twitter", url: "https://twitter.com" }
+            { name: "Reddit", url: "https://www.reddit.com/user/Cubic_coder/" },
+            { name: "Twitter", url: "https://x.com/itz_sayan_03" },
+             { name: "Linkedin", url: "https://www.linkedin.com/in/sayan-mukherjee-898a47257" }
           ].map((s) => (
             <a
               key={s.name}

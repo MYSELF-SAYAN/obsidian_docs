@@ -1,0 +1,287 @@
+---
+title: Sync
+description: Auto-generated API documentation.
+---
+
+# Sync Service
+
+Manage Obsidian Sync for vault synchronization across devices.
+
+## Service Overview
+
+The Sync service provides endpoints to control Obsidian Sync, manage sync history, and restore files from sync history. Requires Obsidian Sync subscription.
+
+## Base URL
+
+```
+/api/platform/sync
+```
+
+## Requirements
+
+- Obsidian Sync plugin must be enabled
+- Valid Obsidian Sync subscription
+- Sync must be configured with remote vault
+
+## Endpoints
+
+---
+
+### POST /api/platform/sync
+
+Toggle sync on or off.
+
+**CLI Command:** `obsidian sync`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `action` | string | No | "on" or "off" |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/sync?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "on"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Sync enabled"
+}
+```
+
+**Turn sync off:**
+```bash
+curl -X POST "http://localhost:3000/api/platform/sync?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "off"}'
+```
+
+**Python (turn off):**
+```python
+response = requests.post("http://localhost:3000/api/platform/sync", params={"vault": "youtube"}, json={
+    "action": "off"
+})
+```
+
+---
+
+### GET /api/platform/sync/status
+
+Get current sync status.
+
+**CLI Command:** `obsidian sync:status`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/sync/status?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Synced 5 minutes ago"
+  }
+}
+```
+
+---
+
+### GET /api/platform/sync/history
+
+Get sync history for a file or overall.
+
+**CLI Command:** `obsidian sync:history`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Filter by file |
+| `path` | string | No | Full path |
+| `limit` | number | No | Maximum entries |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/sync/history?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Notes.md - 5 minutes ago",
+      "Projects/Overview.md - 1 hour ago"
+    ]
+  }
+}
+```
+
+**History for specific file:**
+```bash
+curl "http://localhost:3000/api/platform/sync/history?file=Notes.md&vault=youtube"
+```
+
+**Python (specific file):**
+```python
+response = requests.get("http://localhost:3000/api/platform/sync/history", params={
+    "file": "Notes.md",
+    "vault": "youtube"
+})
+```
+
+**With limit:**
+```bash
+curl "http://localhost:3000/api/platform/sync/history?limit=10&vault=youtube"
+```
+
+---
+
+### GET /api/platform/sync/read
+
+Read a specific version from sync history.
+
+**CLI Command:** `obsidian sync:read`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file |
+| `path` | string | No | Full path |
+| `timestamp` | string | No | Specific version timestamp |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/sync/read?file=Notes.md&vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/sync/restore?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Notes.md", "timestamp": "2026-05-08T10:30:00Z"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/sync/open?vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/sync/deleted?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Archive/OldNotes.md - deleted 2 days ago"
+    ]
+  }
+}
+```
+
+---
+
+## Use Cases
+
+### Find Recent Changes
+
+```bash
+# Get recent sync activity
+curl -s "http://localhost:3000/api/platform/sync/history?limit=5&vault=youtube" \
+  | jq -r '.data.data[]'
+```
+
+### Restore Accidental Delete
+
+```bash
+# Find deleted file
+curl -s "http://localhost:3000/api/platform/sync/deleted?vault=youtube" \
+  | jq -r '.data.data[]'
+
+# Restore
+curl -X POST "http://localhost:3000/api/platform/sync/restore?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Archive/OldNotes.md"}'
+```
+
+### Check Sync Status
+
+```bash
+# Quick status check
+STATUS=$(curl -s "http://localhost:3000/api/platform/sync/status?vault=youtube" | jq -r '.data.data')
+echo "Sync status: $STATUS"
+```
+
+---
+
+## Error Handling
+
+**Sync Not Configured:**
+```json
+{
+  "success": false,
+  "error": "Obsidian Sync not configured"
+}
+```
+
+**No Subscription:**
+```json
+{
+  "success": false,
+  "error": "Obsidian Sync subscription required"
+}
+```
+
+**Version Not Found:**
+```json
+{
+  "success": false,
+  "error": "Sync version not found"
+}
+```
+
+## Related Services
+
+- [History Service](../utilities/history) - Local file history
+- [File Service](../files/file) - File operations
+
+## Notes
+
+- Sync history has limited retention
+- Conflicts are resolved manually through UI
+- Requires internet connection
+- Sync status updates periodically, not real-time

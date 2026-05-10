@@ -1,0 +1,159 @@
+---
+title: Quick Start
+description: Get up and running with the Obsidian SDK in under 5 minutes.
+---
+
+# Quick Start
+
+Get the Obsidian SDK set up and running in your local environment.
+
+## Prerequisites
+
+- **Node.js** 18.x or higher
+- **npm** 9.x or higher (or yarn/pnpm)
+- **Obsidian** installed on your system
+- **Obsidian CLI** (`obsidian`) available in your PATH
+
+## Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/MYSELF-SAYAN/obsidian_cli_api.git
+cd obsidian-sdk
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure Environment
+
+Create a `.env` file in the project root:
+
+```bash
+# Required: Your Obsidian vault name
+OBSIDIAN_VAULT=myVault
+
+# Optional: Custom port (default: 3000)
+PORT=3000
+```
+
+### 4. Start Obsidian CLI Server
+
+Before using the SDK, start the Obsidian CLI server:
+
+```bash
+npm run server
+# or
+npx obsidian server
+```
+
+This starts the local API server on `http://localhost:3000`.
+
+## Installation
+
+### As a Project Dependency
+
+```bash
+npm install obsidian-sdk
+```
+
+### As a Global CLI Tool
+
+```bash
+npm install -g obsidian-sdk
+```
+
+## Basic Usage
+
+### Initialize the SDK
+
+```ts
+import { Obsidian } from "obsidian-sdk";
+
+// Connect to your vault
+const obsidian = new Obsidian({ vault: "myVault" });
+```
+
+### List Files
+
+```ts
+// Get all files in the vault
+const files = await obsidian.files.list();
+console.log(files);
+```
+
+### Read a File
+
+```ts
+// Read specific file content
+const content = await obsidian.files.read("Notes.md");
+console.log(content);
+```
+
+### Search Notes
+
+```ts
+// Search for notes
+const results = await obsidian.search.query("project");
+console.log(results);
+```
+
+## Running Examples
+
+### Run a Single Example
+
+```bash
+node examples/list-files.js
+```
+
+### Run All Examples
+
+```bash
+npm run examples
+```
+
+### Interactive Mode
+
+```bash
+npm run dev
+```
+
+This starts a REPL where you can interact with the SDK methods directly.
+
+## Common Setup Issues
+
+### Obsidian CLI Not Found
+
+If `obsidian` command is not found:
+
+1. Open Obsidian
+2. Go to Settings → About
+3. Enable "Start Obsidian API server"
+4. Or install CLI: `npm install -g obsidian-cli`
+
+### Port Already in Use
+
+If port 3000 is occupied:
+
+```bash
+PORT=3001 npm run server
+```
+
+### Vault Not Found
+
+Verify your vault name matches exactly:
+
+```bash
+# List available vaults
+curl http://localhost:3000/api/vault/list
+```
+
+## Next Steps
+
+- Explore the [API Reference](./index) for all available methods
+- Check out [Service Groups](./files) for categorized endpoints
+- Review example code in the `/examples` directory

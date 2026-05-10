@@ -1,0 +1,194 @@
+---
+title: Properties
+description: Auto-generated API documentation.
+---
+
+# Properties Service
+
+Manage file properties/frontmatter metadata.
+
+## Service Overview
+
+The Properties service provides endpoints to read, set, and delete frontmatter properties from your notes. Properties are key-value metadata stored at the top of Markdown files.
+
+## Base URL
+
+```
+/api/content/properties
+/api/content/property
+```
+
+## Endpoints
+
+---
+
+### GET /api/content/properties
+
+List all property types used in the vault.
+
+**CLI Command:** `obsidian properties`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `counts` | boolean | No | Include usage counts |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/content/properties?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "title",
+      "tags",
+      "created",
+      "modified",
+      "aliases"
+    ]
+  }
+}
+```
+
+**With counts:**
+```bash
+curl "http://localhost:3000/api/content/properties?counts=true&vault=youtube"
+```
+
+**Python (with counts):**
+```python
+response = requests.get("http://localhost:3000/api/content/properties", params={
+    "counts": "true",
+    "vault": "youtube"
+})
+```
+
+---
+
+### GET /api/content/property/:name
+
+Read a specific property value from a file.
+
+**CLI Command:** `obsidian property:read`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Property name to read |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Target file |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/content/property/title?file=Notes.md&vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "kv",
+    "data": {
+      "title": "My Notes"
+    }
+  }
+}
+```
+
+**Multiple parameters:**
+```bash
+curl "http://localhost:3000/api/content/property/tags?file=Notes.md&vault=youtube"
+```
+
+---
+
+### POST /api/content/property/:name
+
+Set a property value on a file.
+
+**CLI Command:** `obsidian property:set`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Property name to set |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `value` | string | Yes | Property value |
+| `type` | string | No | Property type (string, number, date, tags) |
+| `file` | string | No | Target file |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/content/property/status?file=Notes.md&vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"value": "in-progress"}'
+```
+
+```bash
+curl -X POST "http://localhost:3000/api/content/property/priority?file=Notes.md&vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"value": "high", "type": "string"}'
+```
+
+```bash
+curl -X POST "http://localhost:3000/api/content/property/rating?file=Notes.md&vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"value": "5", "type": "number"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:3000/api/content/property/draft?file=Notes.md&vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```bash
+# Add a tag to multiple files
+for file in Projects/*.md; do
+  filename=$(basename "$file" .md)
+  curl -X POST "http://localhost:3000/api/content/property/tags?file=$filename&vault=youtube" \
+    -H "Content-Type: application/json" \
+    -d '{"value": "project", "type": "tags"}'
+done
+```
+
+```bash
+# Read multiple properties from a file
+for prop in title tags created; do
+  curl -s "http://localhost:3000/api/content/property/$prop?file=Notes.md&vault=youtube" \
+    | jq -r '.data.data'
+done
+```
+

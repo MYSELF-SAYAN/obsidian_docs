@@ -1,0 +1,166 @@
+---
+title: Snippets
+description: Auto-generated API documentation.
+---
+
+# Snippets Service
+
+Manage CSS snippets for customizing Obsidian's appearance.
+
+## Service Overview
+
+The Snippets service provides endpoints to list, enable, and disable CSS snippets. Snippets allow you to customize Obsidian's appearance without modifying core theme files.
+
+## Base URL
+
+```
+/api/platform/snippets
+```
+
+## Endpoints
+
+---
+
+### GET /api/platform/snippets
+
+List all CSS snippets in the vault.
+
+**CLI Command:** `obsidian snippets`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/snippets?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "custom-styling.css",
+      "dark-mode-tweaks.css",
+      "typography.css"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/platform/snippets/enabled
+
+List all currently enabled snippets.
+
+**CLI Command:** `obsidian snippets:enabled`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/snippets/enabled?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "dark-mode-tweaks.css"
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/platform/snippets/:name/enable
+
+Enable a CSS snippet.
+
+**CLI Command:** `obsidian snippet:enable`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Snippet filename |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/snippets/custom-styling.css/enable?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Snippet enabled: custom-styling.css"
+}
+```
+
+---
+
+### POST /api/platform/snippets/:name/disable
+
+Disable a CSS snippet.
+
+**CLI Command:** `obsidian snippet:disable`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Snippet filename |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/snippets/custom-styling.css/disable?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```bash
+# Disable all snippets for clean testing
+ALL=$(curl -s "http://localhost:3000/api/platform/snippets?vault=youtube" | jq -r '.data.data[]')
+for snippet in $ALL; do
+  curl -X POST "http://localhost:3000/api/platform/snippets/$snippet/disable?vault=youtube" \
+    -H "Content-Type: application/json" -d '{}'
+done
+
+# Enable one at a time for testing
+curl -X POST "http://localhost:3000/api/platform/snippets/dark-mode-tweaks.css/enable?vault=youtube" \
+  -H "Content-Type: application/json" -d '{}'
+```
+
+```bash
+# Compare all vs enabled
+ALL=$(curl -s "http://localhost:3000/api/platform/snippets?vault=youtube" | jq -r '.data.data[]')
+ENABLED=$(curl -s "http://localhost:3000/api/platform/snippets/enabled?vault=youtube" | jq -r '.data.data[]')
+
+echo "$ALL" | grep -v "$ENABLED"
+```
+

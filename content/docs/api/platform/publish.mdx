@@ -1,0 +1,206 @@
+---
+title: Publish
+description: Auto-generated API documentation.
+---
+
+# Publish Service
+
+Manage Obsidian Publish sites and published notes.
+
+## Service Overview
+
+The Publish service provides endpoints for Obsidian Publish, a cloud service for sharing notes publicly. Requires the Obsidian Publish plugin to be enabled and a Publish subscription.
+
+## Base URL
+
+```
+/api/platform/publish
+```
+
+## Requirements
+
+- Obsidian Publish plugin must be enabled
+- Valid Obsidian Publish subscription
+- Published site must be configured
+
+## Endpoints
+
+---
+
+### GET /api/platform/publish/site
+
+Get information about your publish site.
+
+**CLI Command:** `obsidian publish:site`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/publish/site?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "kv",
+    "data": {
+      "site": "my-site",
+      "domain": "my-site.obsidian.md",
+      "published": "12"
+    }
+  }
+}
+```
+
+---
+
+### GET /api/platform/publish/files
+
+List all published files on the site.
+
+**CLI Command:** `obsidian publish:list`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/publish/files?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "Projects/Overview.md",
+      "Guides/Getting-Started.md",
+      "Daily/2026-05-09.md"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/platform/publish/status
+
+Get the publish status for all notes (published vs unpublished).
+
+**CLI Command:** `obsidian publish:status`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/publish/status?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "12 published, 23 unpublished"
+  }
+}
+```
+
+---
+
+### POST /api/platform/publish/add
+
+Publish a file to your site.
+
+**CLI Command:** `obsidian publish:add`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File name or path |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/publish/add?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Projects/Overview.md"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Published: Projects/Overview.md"
+}
+```
+
+---
+
+### DELETE /api/platform/publish/remove
+
+Unpublish a file from your site.
+
+**CLI Command:** `obsidian publish:remove`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | File name or path |
+| `path` | string | No | Full path to the file |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:3000/api/platform/publish/remove?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"file": "Projects/Overview.md"}'
+```
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/publish/open?vault=youtube"
+```
+
+```bash
+# Publish all files in a folder
+FILES=$(curl -s "http://localhost:3000/api/files?folder=Projects&vault=youtube" | jq -r '.data.data[]')
+for file in $FILES; do
+  curl -X POST "http://localhost:3000/api/platform/publish/add?vault=youtube" \
+    -H "Content-Type: application/json" \
+    -d "{\"file\": \"$file\"}"
+done
+```
+
+```bash
+# Unpublish all, then republish key files
+echo "Unpublishing all files..."
+ALL_PUBLISHED=$(curl -s "http://localhost:3000/api/platform/publish/files?vault=youtube" | jq -r '.data.data[]')
+for file in $ALL_PUBLISHED; do
+  curl -X DELETE "http://localhost:3000/api/platform/publish/remove?vault=youtube" \
+    -H "Content-Type: application/json" \
+    -d "{\"file\": \"$file\"}"
+done
+
+# Republish important files
+for file in "Index.md" "About.md" "Projects/Overview.md"; do
+  curl -X POST "http://localhost:3000/api/platform/publish/add?vault=youtube" \
+    -H "Content-Type: application/json" \
+    -d "{\"file\": \"$file\"}"
+done
+```
+

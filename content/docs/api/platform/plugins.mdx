@@ -1,0 +1,222 @@
+---
+title: Plugins
+description: Auto-generated API documentation.
+---
+
+# Plugins Service
+
+Manage Obsidian plugins - list, install, enable, disable, and uninstall.
+
+## Service Overview
+
+The Plugins service provides comprehensive plugin management including listing installed plugins, enabling/disabling plugins, installing from the community, and managing plugin lifecycle.
+
+## Base URL
+
+```
+/api/platform/plugins
+/api/platform/plugin
+```
+
+## Endpoints
+
+---
+
+### GET /api/platform/plugins
+
+List all installed plugins.
+
+**CLI Command:** `obsidian plugins`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `versions` | boolean | No | Include plugin versions |
+| `filter` | string | No | Filter by plugin ID |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/plugins?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "audio-recorder",
+      "backlink",
+      "bookmarks",
+      "canvas",
+      "daily-notes",
+      "file-explorer",
+      "graph",
+      "sync",
+      "workspaces"
+    ]
+  }
+}
+```
+
+**With versions:**
+```bash
+curl "http://localhost:3000/api/platform/plugins?versions=true&vault=youtube"
+```
+
+---
+
+### GET /api/platform/plugins/enabled
+
+List all currently enabled plugins.
+
+**CLI Command:** `obsidian plugins:enabled`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/plugins/enabled?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      "audio-recorder",
+      "backlink",
+      "bookmarks",
+      "daily-notes",
+      "file-explorer"
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/platform/plugin/:id
+
+Get information about a specific plugin.
+
+**CLI Command:** `obsidian plugin`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Plugin ID |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/platform/plugin/calendar?vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/plugin/calendar/enable?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Plugin enabled: calendar"
+}
+```
+
+---
+
+### POST /api/platform/plugin/:id/disable
+
+Disable a plugin.
+
+**CLI Command:** `obsidian plugin:disable`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Plugin ID |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `filter` | string | No | Filter for plugin search |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/plugin/calendar/disable?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/plugin/obsidian-iconizer/install?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"enable": true}'
+```
+
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:3000/api/platform/plugin/obsidian-iconizer?vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/platform/plugin/calendar/reload?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```bash
+# Get all plugins
+PLUGINS=$(curl -s "http://localhost:3000/api/platform/plugins?vault=youtube" | jq -r '.data.data[]')
+
+# Disable each
+for plugin in $PLUGINS; do
+  case "$plugin" in
+    "file-explorer"|"editor-status"|"switcher"|"command-palette")
+      echo "Skipping essential: $plugin"
+      ;;
+    *)
+      curl -X POST "http://localhost:3000/api/platform/plugin/$plugin/disable?vault=youtube" \
+        -H "Content-Type: application/json" -d '{}'
+      ;;
+  esac
+done
+```
+
+```bash
+# Compare all vs enabled
+ALL=$(curl -s "http://localhost:3000/api/platform/plugins?vault=youtube" | jq -r '.data.data[]')
+ENABLED=$(curl -s "http://localhost:3000/api/platform/plugins/enabled?vault=youtube" | jq -r '.data.data[]')
+
+echo "$ALL" | grep -v "$ENABLED"
+```
+

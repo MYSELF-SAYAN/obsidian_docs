@@ -4,15 +4,13 @@
   "pages": [
     "index",
     "---Getting Started---",
-    "prerequisites",
     "quickstart",
     "---Modules---",
-    "core",
-
-    "productivity",
-
-    "system",
-    "---Developer Tools---",
-    "dev"
+    "content",
+    "files",
+    "platform",
+    "relationships",
+    "utilities"
+    
   ]
 }

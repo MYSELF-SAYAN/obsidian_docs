@@ -1,0 +1,159 @@
+---
+title: Aliases
+description: Auto-generated API documentation.
+---
+
+# Aliases Service
+
+Manage file aliases - alternate names for notes.
+
+## Service Overview
+
+The Aliases service provides endpoints to read and manage aliases for your notes. Aliases allow files to be found by multiple names, useful for organizing and linking.
+
+## Base URL
+
+```
+/api/content/aliases
+```
+
+## Endpoints
+
+---
+
+### GET /api/content/aliases
+
+Get aliases for files in the vault.
+
+**CLI Command:** `obsidian aliases`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | string | No | Get aliases for specific file |
+| `path` | string | No | Full path to file |
+| `total` | boolean | No | Include total count |
+| `verbose` | boolean | No | Include full alias list |
+| `active` | boolean | No | Only show active aliases |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/content/aliases?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": [
+      {"file": "Notes.md", "aliases": ["My Notes", "Notes Archive"]},
+      {"file": "Projects/Overview.md", "aliases": ["Project Index"]}
+    ]
+  }
+}
+```
+
+**Specific file:**
+```bash
+curl "http://localhost:3000/api/content/aliases?file=Notes.md&vault=youtube"
+```
+
+**Python (specific file):**
+```python
+response = requests.get("http://localhost:3000/api/content/aliases", params={
+    "file": "Notes.md",
+    "vault": "youtube"
+})
+```
+
+**Verbose output:**
+```bash
+curl "http://localhost:3000/api/content/aliases?verbose=true&vault=youtube"
+```
+
+**With totals:**
+```bash
+curl "http://localhost:3000/api/content/aliases?total=true&vault=youtube"
+```
+
+---
+
+## Alias Storage
+
+Aliases are stored in file frontmatter:
+
+```yaml
+---
+aliases:
+  - My Notes
+  - Notes Archive
+---
+```
+
+## Use Cases
+
+### Find File by Alias
+
+```bash
+# Search for a file using its alias
+curl -s "http://localhost:3000/api/content/aliases?vault=youtube" \
+  | jq -r '.data.data[] | select(.aliases | contains(["My Notes"])) | .file'
+```
+
+### List All Aliases
+
+```bash
+# Flatten all aliases into a single list
+curl -s "http://localhost:3000/api/content/aliases?vault=youtube" \
+  | jq -r '[.data.data[].aliases[]] | .[]'
+```
+
+### Build Alias Index
+
+```bash
+# Create a reverse index (alias -> file)
+curl -s "http://localhost:3000/api/content/aliases?vault=youtube" \
+  | jq -r '.data.data[] | .aliases[] | "\(.) -> \(.file)"'
+```
+
+---
+
+## Error Handling
+
+**No Aliases:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": []
+  }
+}
+```
+
+**File Not Found:**
+```json
+{
+  "success": false,
+  "error": "File not found: Notes.md"
+}
+```
+
+## Related Services
+
+- [Properties Service](./properties) - Frontmatter management
+- [Search Service](../files/search) - Find files
+- [Links Service](../relationships/links) - Link analysis
+
+## Notes
+
+- Aliases enable `[[Alias Name]]` linking syntax
+- Multiple aliases per file are supported
+- Case-insensitive when linking
+- Empty alias list means file has no aliases

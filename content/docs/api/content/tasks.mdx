@@ -1,0 +1,182 @@
+---
+title: Tasks
+description: Auto-generated API documentation.
+---
+
+# Tasks Service
+
+Manage tasks and todos in your vault.
+
+## Service Overview
+
+The Tasks service provides endpoints to list, retrieve, and manage tasks across your vault. Works with Obsidian's task format (checkbox syntax).
+
+## Base URL
+
+```
+/api/content/tasks
+/api/content/task
+```
+
+## Endpoints
+
+---
+
+### GET /api/content/tasks
+
+List all tasks in the vault with optional filters.
+
+**CLI Command:** `obsidian tasks`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `status` | string | No | Filter by status: "done", "not-done", "any" |
+| `daily` | boolean | No | Include daily notes |
+| `total` | boolean | No | Include total count |
+| `verbose` | boolean | No | Include full task text |
+| `format` | string | No | Output format |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/content/tasks?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "- [x] Task completed on 4/5/2026\n- [ ] Test task\n- [ ] New automated task"
+  }
+}
+```
+
+**Filter by status (done):**
+```bash
+curl "http://localhost:3000/api/content/tasks?status=done&vault=youtube"
+```
+
+**Python (filter by done):**
+```python
+response = requests.get("http://localhost:3000/api/content/tasks", params={
+    "status": "done",
+    "vault": "youtube"
+})
+```
+
+**Filter by status (not done):**
+```bash
+curl "http://localhost:3000/api/content/tasks?status=not-done&vault=youtube"
+```
+
+**With total count:**
+```bash
+curl "http://localhost:3000/api/content/tasks?total=true&vault=youtube"
+```
+
+**Include daily notes:**
+```bash
+curl "http://localhost:3000/api/content/tasks?daily=true&vault=youtube"
+```
+
+---
+
+### GET /api/content/task/:ref
+
+Get details about a specific task.
+
+**CLI Command:** `obsidian task`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ref` | string | Yes | Task reference/ID |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/content/task/ref_123456?vault=youtube"
+```
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/content/task/ref_123456/toggle?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "message",
+    "data": "Task toggled: ref_123456"
+  }
+}
+```
+
+---
+
+### POST /api/content/task/:ref/status
+
+Set a custom status for a task.
+
+**CLI Command:** `obsidian task`
+
+**URL Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ref` | string | Yes | Task reference/ID |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `status` | string | Yes | New status value |
+| `vault` | string | No | Target vault name |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/content/task/ref_123456/status?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "done"}'
+```
+
+```bash
+curl -s "http://localhost:3000/api/content/tasks?status=not-done&vault=youtube" \
+  | jq -r '.data.data'
+```
+
+```bash
+# Get counts
+curl -s "http://localhost:3000/api/content/tasks?total=true&vault=youtube" \
+  | jq '.data'
+```
+
+```bash
+TASK_REF="ref_$(date +%s)"
+curl -X POST "http://localhost:3000/api/content/task/$TASK_REF/toggle?vault=youtube" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+

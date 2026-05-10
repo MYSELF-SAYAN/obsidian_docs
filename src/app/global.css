@@ -10,3 +10,30 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+/* Navbar and Sidebar top - Purple theme */
+:root {
+  --fd-primary: #8e52ff;
+  --fd-primary-foreground: white;
+}
+
+[data-docs-navbar] {
+  background-color: #1a1a2e !important;
+}
+
+.fumadocs-navbar {
+  background-color: #1a1a2e !important;
+  border-bottom: 1px solid rgba(142, 82, 255, 0.2) !important;
+}
+
+.fumadocs-sidebar {
+  border-right: 1px solid rgba(142, 82, 255, 0.2) !important;
+}
+
+.sidebar-tabs a {
+  color: #8e52ff !important;
+}
+
+.sidebar-tabs a:hover {
+  color: #b380ff !important;
+}

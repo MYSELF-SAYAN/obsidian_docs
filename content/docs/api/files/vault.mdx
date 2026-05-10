@@ -1,0 +1,188 @@
+---
+title: Vault
+description: Auto-generated API documentation.
+---
+
+# Vault Service
+
+Manage Obsidian vaults - list, open, and get vault information.
+
+## Service Overview
+
+The Vault service provides endpoints for interacting with Obsidian vaults. It wraps Obsidian CLI vault commands to give you programmatic access to vault management.
+
+## Base URL
+
+```
+/api/files/vault
+```
+
+## Endpoints
+
+---
+
+### GET /api/files/vault
+
+Get information about a specific vault or the default vault.
+
+**CLI Command:** `obsidian vault`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Name of the vault to query |
+| `info` | string | No | Specific info type to retrieve |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/vault?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "kv",
+    "data": {
+      "name": "youtube",
+      "path": "C:\\Users\\sayan\\Documents\\youtube",
+      "files": "23",
+      "folders": "4",
+      "size": "2760"
+    }
+  }
+}
+```
+
+**Example Response (with info):**
+```bash
+curl "http://localhost:3000/api/files/vault?vault=youtube&info=config"
+```
+
+---
+
+### GET /api/files/vault/info
+
+Get vault information using the info subcommand.
+
+**CLI Command:** `obsidian vault`
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/vault/info?vault=youtube"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "kv",
+    "data": {
+      "name": "youtube",
+      "path": "C:\\Users\\sayan\\Documents\\youtube"
+    }
+  }
+}
+```
+
+---
+
+### GET /api/files/vault/list
+
+List all available vaults on the system.
+
+**CLI Command:** `obsidian vaults`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `vault` | string | No | Filter by vault name |
+
+
+**Example Request:**
+
+```bash
+curl "http://localhost:3000/api/files/vault/list"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "list",
+    "data": ["youtube", "personal", "work"]
+  }
+}
+```
+
+---
+
+### POST /api/files/vault/open
+
+Open a specific vault in Obsidian.
+
+**CLI Command:** `obsidian vault:open`
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Name of the vault to open |
+| `vault` | string | No | Vault context |
+
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost:3000/api/files/vault/open" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "youtube"}'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": "Opening vault: youtube"
+}
+```
+
+---
+
+## Error Handling
+
+**Missing Vault:**
+```json
+{
+  "success": false,
+  "error": "Vault 'nonexistent' not found"
+}
+```
+
+**Obsidian Not Running:**
+```json
+{
+  "success": false,
+  "error": "Obsidian is not running"
+}
+```
+
+## Related Services
+
+- [File Service](./file) - Work with files within vaults
+- [Workspace Service](./workspace) - Workspace management
+
+## Notes
+
+- If no vault is specified, the API uses the last active vault
+- Vault names are case-sensitive
+- Some operations require Obsidian to be running
